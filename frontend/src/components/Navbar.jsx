@@ -22,9 +22,21 @@ const Navbar = () => {
         <nav className="flex justify-between items-center max-w-screen-2xl mx-auto">
             {/* left side */}
             <div className="flex items-center md:gap-16 gap-4">
-                <Link to="/">
-                <img src="/android-chrome-512x512.png" alt="" className="size-10"/>
-                </Link>
+
+              <div className="flex items-center">
+                <div>
+                  <Link to="/">
+                    <img src="/FullyBooked-white.png" alt="" className="size-10"/>
+                  </Link>                  
+                </div>
+                <div>
+                  <Link to="/">
+                    <h3 className="font-bold text-yellow-100">FULLY BOOKED</h3>    
+                  </Link>                
+                </div>
+                
+              </div>
+
 
                 {/* search */}
                 <div className="relative sm:w-72 w-40 space-x-2">

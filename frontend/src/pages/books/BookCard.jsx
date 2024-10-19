@@ -21,6 +21,7 @@ const BookCard = ({book}) => {
             </div>
 
             <div>
+                <div className='w-40 h-[4px] bg-primary mb-5'></div>
                 <Link to={`/books/${book._id}`}>
                     <h3 className="text-xl font-semibold hover:text-blue-600 mb-3">
                         {book?.title}

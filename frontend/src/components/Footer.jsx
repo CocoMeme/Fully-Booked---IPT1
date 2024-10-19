@@ -13,7 +13,7 @@ const Footer = () => {
           <div className='flex items-center'>
             <img src="/android-chrome-512x512.png" alt="Logo" className="mb-5 w-36" />            
             <div className='items-center'>
-              <h1 className='font-extrabold text-2xl mb-5'>
+              <h1 className='font-extrabold text-4xl mb-5'>
                   <span className="bg-gradient-to-r from-yellow-400 to-red-500 bg-clip-text text-transparent">FULLY</span><br/>
                   <span className="bg-gradient-to-r from-green-300 to-green-700 bg-clip-text text-transparent">BOOKED</span>
               </h1>
