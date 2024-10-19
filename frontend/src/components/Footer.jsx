@@ -10,7 +10,17 @@ const Footer = () => {
       <div className="container mx-auto flex flex-col md:flex-row justify-between items-center gap-8">
         {/* Left Side - Logo and Nav */}
         <div className="md:w-1/2 w-full">
-          <img src={footerLogo} alt="Logo" className="mb-5 w-36" />
+          <div className='flex items-center'>
+            <img src="/android-chrome-512x512.png" alt="Logo" className="mb-5 w-36" />            
+            <div className='items-center'>
+              <h1 className='font-extrabold text-2xl mb-5'>
+                  <span className="bg-gradient-to-r from-yellow-400 to-red-500 bg-clip-text text-transparent">FULLY</span><br/>
+                  <span className="bg-gradient-to-r from-green-300 to-green-700 bg-clip-text text-transparent">BOOKED</span>
+              </h1>
+            </div>
+
+          </div>
+          
           <ul className="flex flex-col md:flex-row gap-4">
             <li><a href="#home" className="hover:text-primary">Home</a></li>
             <li><a href="#services" className="hover:text-primary">Services</a></li>

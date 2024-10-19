@@ -16,14 +16,14 @@ const Navbar = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
   console.log(isDropdownOpen)
 
-  const currentuser = true
+  const currentuser = false;
   return (
     <header className="  px-4 py-6 bg-primary">
         <nav className="flex justify-between items-center max-w-screen-2xl mx-auto">
             {/* left side */}
             <div className="flex items-center md:gap-16 gap-4">
                 <Link to="/">
-                <FaBullseye className="size-8"/>
+                <img src="/android-chrome-512x512.png" alt="" className="size-10"/>
                 </Link>
 
                 {/* search */}
