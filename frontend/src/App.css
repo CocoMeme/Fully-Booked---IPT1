@@ -31,6 +31,10 @@
     font-size: 16px !important;
 }
 
+.btn-primary {
+    @apply bg-primary  px-12 py-2 rounded-md text-base font-secondary font-bold hover:bg-secondary hover:text-white transition-all duration-200 cursor-pointer
+ }
+
 @keyframes gradientWave {
     0% {
         background-position: 0% 50%;
@@ -40,11 +44,11 @@
     }
 }
 
-.btn-primary {
+.btn-special {
     @apply bg-primary px-12 py-2 rounded-md text-base font-secondary font-bold transition-all duration-200 cursor-pointer;
 }
 
-.btn-primary:hover {
+.btn-special:hover {
     background: linear-gradient(90deg, yellow, red, green, yellow);
     background-size: 200% 200%;
     animation: gradientWave 1s linear infinite;

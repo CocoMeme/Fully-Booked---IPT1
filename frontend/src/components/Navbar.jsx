@@ -3,6 +3,7 @@ import { FaBullseye, FaMagnifyingGlass, FaCircleUser, FaBookmark, FaBagShopping 
 
 import avatarImg from "../assets/avatar.png"
 import { useState } from "react";
+import { useSelector } from "react-redux";
 
 const navigation = [
   {name: "Dashboard", href: "/dashboard"},
@@ -13,8 +14,12 @@ const navigation = [
 
 const Navbar = () => {
 
+
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
-  console.log(isDropdownOpen)
+
+  const cartItems = useSelector(state => state.cart.cartItems);
+
+  console.log(cartItems)
 
   const currentuser = false;
   return (
@@ -82,7 +87,15 @@ const Navbar = () => {
                 </button>
                 <Link to="/cart" className="relative">
                   <FaBagShopping className="size-6 text-white"/>
-                  <span className="text-sm font-semibold absolute top-0 right-0 transform translate-x-1/2 -translate-y-1/2 p-1 rounded-full bg-blackBG h-6 w-6 flex items-center justify-center">0</span>
+                  {
+                    cartItems.length > 0 ? <span className="text-sm font-semibold absolute top-0 right-0 transform translate-x-1/2 
+                      -translate-y-1/2 p-1 rounded-full bg-blackBG h-6 w-6 flex items-center justify-center">
+                    {cartItems.length}</span> : <span className="text-sm font-semibold absolute top-0 right-0 transform translate-x-1/2 
+                      -translate-y-1/2 p-1 rounded-full bg-blackBG h-6 w-6 flex items-center justify-center">
+                      0</span>
+                  }
+
+                  
                 </Link>
             </div>
         </nav>

@@ -16,7 +16,7 @@ const Banner = () => {
                     <img src="/android-chrome-512x512.png" alt="" className='size-20'/>
                 </div>
                 <div>
-                    <h1 className='font-extrabold text-6xl mb-0'>
+                    <h1 className='font-extrabold text-7xl mb-0'>
                         <span className="bg-gradient-to-r from-yellow-400 to-red-500 bg-clip-text text-transparent">FULLY</span>
                         &nbsp;
                         <span className="bg-gradient-to-r from-green-300 to-green-700 bg-clip-text text-transparent">BOOKED</span>
@@ -27,12 +27,12 @@ const Banner = () => {
 
 
             <div className='ml-6'>
-                <h1 className='md:text-5xl text-2xl font-medium mb-7'>Newly Released Books!</h1>
+                <h1 className='md:text-5xl text-lg font-medium mb-7'>Newly Released Books!</h1>
                 <p className='mb-10'>
                     Its time to update your reading list with some of the latest and greatest releases in the literary world. 
                     From heart-pumping thrillers to captivating memoirs, this weeks new releases offer something for everyone
                 </p>
-                <button className='btn-primary'>
+                <button className='btn-special'>
                     Shop Now!
                 </button>
             </div>
