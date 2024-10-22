@@ -7,6 +7,7 @@ import { Pagination, Navigation } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/pagination';
 import 'swiper/css/navigation';
+import { useFetchAllBooksQuery } from '../../redux/features/books/BooksApi';
 
 // import required modules
 
@@ -14,13 +15,12 @@ import 'swiper/css/navigation';
 const categories = ["Choose a genre", "Business", "Fiction", "Horror", "Adventure"]
 
 const TopSellers = () => {
-    const [books, setBooks] = useState([]);
+
     const [selectedCategory, setSelectedCategory] = useState("Choose a genre"); // Set it to a string
 
-    useEffect(() => {
-        fetch("books.json").then(res => res.json()).then((data) => setBooks(data))
-    }, [])
 
+    const {data: books =  []} = useFetchAllBooksQuery();
+    console.log(books)
 
     const filteredBooks = selectedCategory === "Choose a genre" ? books : books.filter(book => 
         book.category.toLowerCase() === selectedCategory.toLowerCase()) // Fix the logic to ensure proper comparison
