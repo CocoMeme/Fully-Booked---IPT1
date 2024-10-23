@@ -1,21 +1,39 @@
 import React, { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 
 import { useForm } from "react-hook-form";
 
 import { FaGoogle } from "react-icons/fa6";
-import { FaArrowCircleRight } from "react-icons/fa";
+import { useAuth } from '../context/AuthContext';
 
 
 const Login = () => {
 
-    const [message, setMessage] = useState()
+    const [message, setMessage] = useState("")
+    const { loginUser, signInWithGoogle} = useAuth()
     const { register, handleSubmit, watch, formState: { errors } } = useForm();
+    const navigate = useNavigate()
+    const onSubmit = async(data) => {
+        try {
+            await loginUser(data.email, data.password)
+            alert("Login successful!")
+            navigate("/")
+            // Ilagay dito yung bagong alert
+        } catch (error) {
+            setMessage("Please provide valid email and password")
+            console.log(error)
+        }
+    };
 
-    const onSubmit = data => console.log(data);
-
-    const handleGoogleSignIn = () => {
-
+    const handleGoogleSignIn = async() => {
+        try {
+            await signInWithGoogle()
+            alert("Login successful!")
+            navigate("/")
+        } catch (error) {
+            alert("Google sign in failed")
+            console.log(error)
+        }
     }
 
 
@@ -48,7 +66,7 @@ const Login = () => {
                     leading-tight focus:outline-none focus:shadow'/>
                 </div>
                 {
-                    message && <p className='text-red-500 text-xs italic mb-3'>{message}</p>
+                    message && <p className='text-red-500 text-xs italic mb-3 text-center'>{message}</p>
                 }
 
                 <p className='align-baseline font-medium mt-4 text-sm text-center'>Haven't an account? <Link to="/register" className='font-extrabold hover:text-green-500'>Register</Link> here!</p>

@@ -38,7 +38,11 @@ const bookSchema = new mongoose.Schema({
   coverImage: {
     type: String, 
     required: true,
-  }
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now,
+  },
 }, { timestamps: true });
 
 

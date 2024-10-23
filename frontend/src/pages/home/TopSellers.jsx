@@ -12,7 +12,7 @@ import { useFetchAllBooksQuery } from '../../redux/features/books/BooksApi';
 // import required modules
 
 
-const categories = ["Choose a genre", "Business", "Fiction", "Horror", "Adventure"]
+const categories = ["Choose a genre", "Adventure", "Fiction", "Business", "Action", "Comedy", "Drama", "Horror"]
 
 const TopSellers = () => {
 
@@ -20,7 +20,6 @@ const TopSellers = () => {
 
 
     const {data: books =  []} = useFetchAllBooksQuery();
-    console.log(books)
 
     const filteredBooks = selectedCategory === "Choose a genre" ? books : books.filter(book => 
         book.category.toLowerCase() === selectedCategory.toLowerCase()) // Fix the logic to ensure proper comparison

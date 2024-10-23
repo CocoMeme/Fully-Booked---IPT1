@@ -32,7 +32,7 @@ const Banner = () => {
                     Its time to update your reading list with some of the latest and greatest releases in the literary world. 
                     From heart-pumping thrillers to captivating memoirs, this weeks new releases offer something for everyone
                 </p>
-                <button className='btn-special'>
+                <button className='btn-special shadow-md'>
                     Shop Now!
                 </button>
             </div>

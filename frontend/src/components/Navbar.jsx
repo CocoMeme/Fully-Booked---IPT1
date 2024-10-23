@@ -4,6 +4,7 @@ import { FaBullseye, FaMagnifyingGlass, FaCircleUser, FaBookmark, FaBagShopping 
 import avatarImg from "../assets/avatar.png"
 import { useState } from "react";
 import { useSelector } from "react-redux";
+import { useAuth } from "../context/AuthContext";
 
 const navigation = [
   {name: "Dashboard", href: "/dashboard"},
@@ -19,9 +20,17 @@ const Navbar = () => {
 
   const cartItems = useSelector(state => state.cart.cartItems);
 
-  console.log(cartItems)
+  // console.log(cartItems)
 
-  const currentuser = false;
+  const { currentUser, logout } = useAuth()
+
+  const handleLogout = () => {
+    logout()
+    alert("Logout successfully")
+  }
+
+
+
   return (
     <header className="  px-4 py-6 bg-primary">
         <nav className="flex justify-between items-center max-w-screen-2xl mx-auto">
@@ -55,10 +64,10 @@ const Navbar = () => {
             <div className="relateive flex items-center md:space-x-3 space-x-2">
                 <div>
                   {
-                    currentuser ? <>
+                    currentUser ? <>
                     <button onClick={() => setIsDropdownOpen(!isDropdownOpen)}>
                       <img src={avatarImg} alt="" className={`size-7 rounded-full
-                      ${currentuser ? 'ring-2 ring-white' : ''}`}/>
+                      ${currentUser ? 'ring-2 ring-white' : ''}`}/>
                     </button>
                     {/* show dropdowns */}
                     {
@@ -74,6 +83,12 @@ const Navbar = () => {
                                 </li>
                               ))
                             }
+                            <li>
+                              <button 
+                                onClick={handleLogout}
+                                className="block w-full text-left px-4 py-2 text-sm hover:bg-gray-100">
+                                Logout</button>
+                            </li>
                           </ul>
                         </div>
                       )

@@ -1,23 +1,48 @@
 import React, { useState } from 'react';
-
-import { Link } from 'react-router-dom'
-
+import { Link, useNavigate } from 'react-router-dom'
 import { useForm } from "react-hook-form";
-
 import { FaGoogle } from "react-icons/fa6";
 import { FaArrowCircleRight } from "react-icons/fa";
+import { useAuth } from '../context/AuthContext';
 
 
 
 const Register = () => {
 
-    const [message, setMessage] = useState()
-    const { register, handleSubmit, watch, formState: { errors } } = useForm();
+    const [message, setMessage] = useState("");
+    const {registerUser, signInWithGoogle} = useAuth();
+    const navigate = useNavigate()
+    console.log(registerUser)
 
-    const onSubmit = data => console.log(data);
+    const { 
+        register, 
+        handleSubmit, 
+        watch, 
+        formState: { errors },
+    } = useForm();
 
-    const handleGoogleSignIn = () => {
-        
+
+    // Register User
+    const onSubmit = async(data) => {
+        console.log(data)
+        try {
+            await registerUser(data.email, data.password)
+            alert("User registered successfully!")
+        } catch (error) {
+            setMessage("Please provide valid email and password")
+            console.log(error)
+        }
+    }
+
+    const handleGoogleSignIn = async() => {
+        try {
+            await signInWithGoogle()
+            alert("Login successful!")
+            navigate("/")
+        } catch (error) {
+            alert("Google sign up failed")
+            console.log(error)
+        }
     }
 
 
@@ -50,7 +75,7 @@ const Register = () => {
                     leading-tight focus:outline-none focus:shadow'/>
                 </div>
                 {
-                    message && <p className='text-red-500 text-xs italic mb-3'>{message}</p>
+                    message && <p className='text-red-500 text-xs italic mb-3 text-center'>{message}</p>
                 }
 
                 <p className='align-baseline font-medium mt-4 text-sm text-center'>Already have an account? <Link to="/login" className='font-extrabold hover:text-green-500'>Login</Link> here!</p>
