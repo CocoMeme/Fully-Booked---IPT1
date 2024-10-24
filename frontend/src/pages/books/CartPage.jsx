@@ -10,7 +10,6 @@ const CartPage = () => {
 
   const cartItems = useSelector((state) => state.cart.cartItems);
 
-  // Calculate total price: use discountPrice if available, otherwise use the price
   const totalPrice = cartItems
     .reduce((acc, item) => acc + (item?.discountPrice ?? item.price), 0)
     .toFixed(2);

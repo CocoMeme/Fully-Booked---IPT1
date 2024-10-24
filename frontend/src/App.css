@@ -55,11 +55,33 @@
     color: white;
 }
 
-
-
-
-
-
 .html{
    scroll-behavior: smooth;
 }
+
+/* For Navigation Pages */
+@keyframes gradientWave {
+    0% {
+      background-position: 0% 50%;
+    }
+    100% {
+      background-position: 200% 50%;
+    }
+  }
+  
+  .nav-item {
+    transition: all 0.5s ease;
+  }
+  
+  .nav-item:hover {
+    background: linear-gradient(90deg, green, red, yellow, green);
+    /* transform: scale(1.1); */
+    background-size: 200% 200%;
+    font-weight: 700;
+    animation: gradientWave 1s linear infinite;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4);
+  }
+  

@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 
 import { useForm } from "react-hook-form";
 
-import { FaGoogle } from "react-icons/fa6";
+import { FaFacebook, FaGoogle } from "react-icons/fa6";
 import { useAuth } from '../context/AuthContext';
 
 
@@ -74,7 +74,7 @@ const Login = () => {
                 <div className='mt-4'>
                     <button className=' w-full flex flex-wrap gap-1 items-center justify-center bg-primary hover:bg-red-500 text-white 
                     font-bold py-2 px-8 rounded focus:outline-none transition-all duration-200 cursor-pointer'>
-                    <img src="/FullyBooked-white.png" alt="" className='size-5'/>
+                    <img src="/FullyBooked-white.png" alt="" className='size-6'/>
                     Login
                     </button>
                 </div>
@@ -87,7 +87,7 @@ const Login = () => {
             </div>
 
             
-            {/* googel signin */}
+            {/* Google Signin */}
             <div className='mt-4'>
                 <button 
                 onClick={handleGoogleSignIn}
@@ -95,6 +95,17 @@ const Login = () => {
                 font-bold py-2 px-4 rounded focus:outline-none hover:bg-green-900'>
                     <FaGoogle />
                     Sign in with Google
+                </button>
+            </div>
+
+            {/* Facebook Signin */}
+            <div className='mt-4'>
+                <button 
+                // onClick={handleFacebookSignIn}
+                className='w-full flex flex-wrap gap-1 items-center justify-center bg-blue-700 text-white transition-all duration-200 cursor-pointer
+                font-bold py-2 px-4 rounded focus:outline-none hover:bg-blue-900'>
+                    <FaFacebook />
+                    Sign in with Facebook
                 </button>
             </div>
 

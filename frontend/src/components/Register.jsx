@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom'
 import { useForm } from "react-hook-form";
-import { FaGoogle } from "react-icons/fa6";
+import { FaFacebook, FaGoogle } from "react-icons/fa6";
 import { FaArrowCircleRight } from "react-icons/fa";
 import { useAuth } from '../context/AuthContext';
 
@@ -96,7 +96,7 @@ const Register = () => {
             </div>
 
             
-            {/* googel signin */}
+            {/* Google Signin */}
             <div className='mt-4'>
                 <button 
                 onClick={handleGoogleSignIn}
@@ -104,6 +104,17 @@ const Register = () => {
                 font-bold py-2 px-4 rounded focus:outline-none hover:bg-green-900'>
                     <FaGoogle />
                     Sign up with Google
+                </button>
+            </div>
+
+            {/* Google Signin */}
+            <div className='mt-4'>
+                <button 
+                // onClick={handleGoogleSignIn}
+                className='w-full flex flex-wrap gap-1 items-center justify-center bg-blue-700 text-white transition-all duration-200 cursor-pointer
+                font-bold py-2 px-4 rounded focus:outline-none hover:bg-blue-900'>
+                    <FaFacebook />
+                    Sign up with Facebook
                 </button>
             </div>
 

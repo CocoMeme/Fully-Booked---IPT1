@@ -34,7 +34,8 @@ const Navbar = () => {
   return (
     <header className="  px-4 py-6 bg-primary">
         <nav className="flex justify-between items-center max-w-screen-2xl mx-auto">
-            {/* left side */}
+            
+            {/* Left side */}
             <div className="flex items-center md:gap-16 gap-4">
 
               <div className="flex items-center">
@@ -52,15 +53,31 @@ const Navbar = () => {
               </div>
 
 
-                {/* search */}
-                <div className="relative sm:w-72 w-40 space-x-2">
+            {/* search */}
+            <div className="relative sm:w-72 w-40 space-x-2">
                   <FaMagnifyingGlass className="absolute inline-block left-4 inset-y-2 "/>
                   <input type="text" placeholder="Search a Book" 
                   className="bg-[#EAEAEA] w-full py-1 md:px-8 px-6 rounded-md focus:outline-none"/>
                 </div>
             </div>
+
+            {/* Center */}
+            <div className="w-2/5 text-white">
+              <ul className="flex md:gap-4 text-md text-center font-semibold">
+                <Link to="/">
+                  <li className="nav-item">Store</li>
+                </Link>
+                <Link to="/">
+                  <li className="nav-item">Courier</li>
+                </Link>
+                <Link to="/">
+                  <li className="nav-item">About Us</li>
+                </Link>
+              </ul>
+            </div>
+
                 
-            {/* right side */}
+            {/* Right side */}
             <div className="relateive flex items-center md:space-x-3 space-x-2">
                 <div>
                   {
