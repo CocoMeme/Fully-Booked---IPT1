@@ -1,7 +1,6 @@
 const express = require('express');
 const app = express();
 const cors = require("cors");
-
 const mongoose = require('mongoose');
 const port = process.env.port || 5000;
 require('dotenv').config()
@@ -14,22 +13,26 @@ app.use(cors({
 }))
 
 // ROUTES
-const bookRoutes = require('./src/books/book.route')
-app.use("/api/books", bookRoutes )
+const bookRoutes = require('./src/books/book.route');
+const orderRoutes = require('./src/orders/order.route');
+const userRoutes = require('./src/users/user.route');
+
+app.use("/api/books", bookRoutes);
+app.use("/api/orders", orderRoutes);
+app.use("/api/auth", userRoutes);
+
+// ROOT ROUTE
+app.use("/", (req, res) => {
+  res.send("Fully Booked Server is running!");
+});
 
 async function main() {
     await mongoose.connect(process.env.DB_URL);
-    app.use("/", (req, res) => {
-      res.send("Fully Booked Server is running!")
-    });    
+    console.log("Mongodb connected successfully!")
 }
 
-main().then(() => console.log("Mongodb connected successfully!"))
-      .catch(err => console.log(err));
+main().catch(err => console.log(err));
 
 app.listen(port, () => {
-  console.log(`Fully Booked app listening on port ${port}`)
-})
-
-
-
+  console.log(`Fully Booked app listening on port ${port}`);
+});

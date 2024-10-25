@@ -40,7 +40,20 @@ const Profile = () => {
 
                             <div className="lg:col-span-2">
                                 <div className="grid gap-4 gap-y-2 text-sm grid-cols-1 md:grid-cols-5">
-                                    <div className="md:col-span-5">
+                                    <div className="md:col-span-2">
+                                        <label htmlFor="username">Username</label>
+                                        <input
+                                            {...register("username")}
+                                            type="username"
+                                            name="username"
+                                            id="username"
+                                            className="h-10 border mt-1 rounded px-4 w-full bg-gray-50"
+                                            defaultValue={currentUser?.username || ''}
+                                            placeholder="You full name"
+                                        />
+                                        {errors.email && <span>This field is required</span>}
+                                    </div>
+                                    <div className="md:col-span-3">
                                         <label htmlFor="email">Email Address</label>
                                         <input
                                             {...register("email", { required: true })}
@@ -140,16 +153,24 @@ const Profile = () => {
                                         {errors.zipcode && <span>This field is required</span>}
                                     </div>
 
-                                    <div className="md:col-span-5 text-right">
+                                    <div className="md:col-span-5 text-end">
+                                        <div className="inline-flex items-end mr-5">
+                                            <button
+                                                type="submit"
+                                                className="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded">
+                                                Apply as Courier
+                                            </button>
+                                        </div>                                        
                                         <div className="inline-flex items-end">
                                             <button
                                                 type="submit"
-                                                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-                                            >
+                                                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
                                                 Update Profile
                                             </button>
                                         </div>
+
                                     </div>
+                                    
                                 </div>
                             </div>
                         </form>
