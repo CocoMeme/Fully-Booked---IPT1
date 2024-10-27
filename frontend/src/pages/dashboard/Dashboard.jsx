@@ -3,9 +3,8 @@ import { useNavigate } from 'react-router-dom'
 import getBaseUrl from '../../utils/baseURL'
 import axios from 'axios'
 import Loading from '../../components/Loading'
-import { MdIncompleteCircle } from 'react-icons/md'
-import OrdersChart from './OrdersChart';
-import SalesChart from './SalesChart'
+import OrdersChart from '../dashboard/Charts/OrdersChart';
+import SalesChart from '../dashboard/Charts/SalesChart'
 
 import { GoBook } from "react-icons/go";
 import { IoMdTrendingUp } from "react-icons/io";
@@ -132,7 +131,7 @@ const Dashboard = () => {
                         <span className="block text-gray-500">Website visits (last day)</span>
                     </div>
                 </div>
-                <div className="row-span-3 bg-white shadow rounded-lg">
+                {/* <div className="row-span-3 bg-white shadow rounded-lg">
                     <div className="flex items-center justify-between px-6 py-5 font-semibold border-b border-gray-100">
                         <span>Users by average order</span>
                         <button type="button" className="inline-flex justify-center rounded-md px-1 -mr-1 bg-white text-sm leading-5 font-medium text-gray-500 hover:text-gray-600" id="options-menu" aria-haspopup="true" aria-expanded="true">
@@ -155,7 +154,7 @@ const Dashboard = () => {
                             
                         </ul>
                     </div>
-                </div>
+                </div> */}
 
             </section>
 

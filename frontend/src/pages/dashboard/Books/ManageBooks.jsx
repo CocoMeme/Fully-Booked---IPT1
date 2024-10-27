@@ -1,6 +1,6 @@
 import React from 'react'
 import { Link, Outlet, useNavigate } from 'react-router-dom';
-import { useDeleteBookMutation, useFetchAllBooksQuery } from '../../redux/features/books/booksApi';
+import { useDeleteBookMutation, useFetchAllBooksQuery } from '../../../redux/features/books/booksApi';
 
 const ManageBooks = () => {
     const navigate = useNavigate();
@@ -30,7 +30,7 @@ const ManageBooks = () => {
     return (
 
         <section className="py-1 bg-blueGray-50">
-            <main className="mb-5">
+            <main className="mb-7 w-full xl:w-10/12 xl:mb-7 px-4 mx-auto">
                 <div className="flex flex-col space-y-6 md:space-y-0 md:flex-row justify-between">
                     <div className="mr-6">
                         <h1 className="text-4xl font-bold mb-1">Book Management</h1>
@@ -53,8 +53,8 @@ const ManageBooks = () => {
                 </div>
                 <Outlet />
             </main>
-            <div className="w-full xl:w-8/12 mb-12 xl:mb-0 px-4 mx-auto">
-                <div className="relative flex flex-col min-w-0 break-words bg-white w-full mb-6 shadow-lg rounded ">
+            <div className="w-full xl:w-10/12 mb-12 xl:mb-0 px-4 mx-auto">
+                <div className=" relative flex flex-col min-w-0 break-words bg-white w-full mb-6 shadow-lg rounded ">
                     <div className="rounded-t mb-0 px-4 py-3 border-0">
                         <div className="flex flex-wrap items-center">
                             <div className="relative w-full px-4 max-w-full flex-grow flex-1">
@@ -82,6 +82,9 @@ const ManageBooks = () => {
                                         Category
                                     </th>
                                     <th className="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">
+                                        Tag
+                                    </th>
+                                    <th className="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">
                                         Price
                                     </th>
                                     <th className="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">
@@ -106,6 +109,9 @@ const ManageBooks = () => {
                                             <td className="border-t-0 px-6 align-center border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
                                                 {book.category}
                                             </td>
+                                            <td className="border-t-0 px-6 align-center border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
+                                                {book.tag}
+                                            </td>
                                             <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
                                                 ₱{book.price}
                                             </td>
@@ -114,7 +120,7 @@ const ManageBooks = () => {
                                             </td>
                                             <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4 space-x-4">
 
-                                                <Link to={`/dashboard/edit-book/${book._id}`} className="font-medium text-indigo-600 hover:text-indigo-700 mr-2 hover:underline underline-offset-2">
+                                                <Link to={`/dashboard/edit-book/${book._id}`} className="font-medium bg-blue-500 py-1 px-7 rounded-full text-white  ">
                                                     Edit
                                                 </Link>
                                                 <button

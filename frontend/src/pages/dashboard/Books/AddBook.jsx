@@ -1,79 +1,61 @@
-import React, { useEffect, useState } from 'react'
-import InputField from '../dashboard/Add Book/InputField'
-import SelectField from '../dashboard/Add Book/SelectField'
-import { useForm } from 'react-hook-form'
-import { Link, Outlet, useParams } from 'react-router-dom'
-import Loading from '../../components/Loading'
-import Swal from 'sweetalert2'
-import axios from 'axios'
-import getBaseUrl from '../../utils/baseURL'
-import { useFetchBookByIdQuery, useUpdateBookMutation } from '../../redux/features/books/booksApi';
+import React, { useState } from 'react'
+import InputField from './InputField'
+import SelectField from './SelectField'
+import { useForm } from 'react-hook-form';
+import Swal from 'sweetalert2';
+import { useAddBookMutation } from '../../../redux/features/books/booksApi';
+import { Link, Outlet } from 'react-router-dom';
 
-
-const UpdateBook = () => {
-  const { id } = useParams();
-  const { data: bookData, isLoading, isError, refetch } = useFetchBookByIdQuery(id);
-  const [updateBook] = useUpdateBookMutation();
-  const { register, handleSubmit, setValue, reset } = useForm();
-
-  // New state for tag
+const AddBook = () => {
+  const { register, handleSubmit, formState: { errors }, reset } = useForm();
+  const [imageFile, setimageFile] = useState(null);
+  const [addBook, { isLoading, isError }] = useAddBookMutation()
+  const [imageFileName, setimageFileName] = useState('');
   const [tag, setTag] = useState('');
 
-  useEffect(() => {
-    if (bookData) {
-      setValue('title', bookData.title);
-      setValue('description', bookData.description);
-      setValue('category', bookData.category);
-      setValue('tag', bookData.tag);
-      setValue('price', bookData.price);
-      setValue('discountPrice', bookData.discountPrice);
-      setValue('coverImage', bookData.coverImage);
-      setTag(bookData.tag);  // Set initial tag state
-    }
-  }, [bookData, setValue]);
-
-  const handleTagChange = (e) => {
-    setTag(e.target.value);
-  };
-
   const onSubmit = async (data) => {
-    const updateBookData = {
-      title: data.title,
-      description: data.description,
-      category: data.category,
-      tag: data.tag,
-      price: Number(data.price),
-      discountPrice: tag === 'Sale' ? Number(data.discountPrice) : null, // Set to null if not "Sale"
-      coverImage: data.coverImage || bookData.coverImage,
-    };
+    // Exclude discountPrice if tag is not "Sale"
+    const newBookData = {
+      ...data,
+      coverImage: imageFileName,
+      discountPrice: tag === 'Sale' ? data.discountPrice : undefined, // Only include discountPrice if tag is "Sale"
+    }
 
     try {
-      await axios.put(`${getBaseUrl()}/api/books/edit/${id}`, updateBookData, {
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
-      });
+      await addBook(newBookData).unwrap();
       Swal.fire({
-        title: "Book Updated",
-        text: "Your book is updated successfully!",
+        title: "Book added",
+        text: "Your book is uploaded successfully!",
         icon: "success",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Confirm!"
       });
-      await refetch();
+      reset();
+      setimageFileName('');
+      setimageFile(null);
     } catch (error) {
-      console.log("Failed to update book.");
-      alert("Failed to update book.");
+      console.error(error);
+      alert("Failed to add book. Please try again.")
     }
-  };
+  }
 
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setimageFile(file);
+      setimageFileName(file.name);
+    }
+  }
 
-  if (isLoading) return <Loading />;
-  if (isError) return <div>Error fetching book data</div>;
+  const handleTagChange = (e) => {
+    setTag(e.target.value); // Update tag state
+  }
 
   return (
     <section className="py-1 bg-blueGray-50">
-
-      <main className="mb-5">
+      <main className="mb-7 w-full xl:w-10/12 xl:mb-7 px-4 mx-auto">
         <div className="flex flex-col space-y-6 md:space-y-0 md:flex-row justify-between">
           <div className="mr-6">
             <h1 className="text-4xl font-bold mb-1">Book Management</h1>
@@ -96,12 +78,13 @@ const UpdateBook = () => {
         </div>
         <Outlet />
       </main>
-      
+
       <div className="max-w-lg mx-auto md:p-6 p-3 bg-white rounded-lg shadow-md">
 
-        <h2 className="text-2xl font-bold text-gray-800 mb-4">Update Book</h2>
+        <h2 className="text-2xl font-bold text-gray-800 mb-4">Add New Book</h2>
 
-        <form onSubmit={handleSubmit(onSubmit)}>
+        {/* Form starts here */}
+        <form onSubmit={handleSubmit(onSubmit)} className=''>
           {/* Title */}
           <InputField
             label="Title"
@@ -154,7 +137,7 @@ const UpdateBook = () => {
               { value: 'Sale', label: 'Sale' },
             ]}
             register={register}
-            onChange={handleTagChange} // Update tag state on change
+            onChange={handleTagChange}
           />
 
           {/* Discount Price */}
@@ -165,26 +148,27 @@ const UpdateBook = () => {
             placeholder="Discount Price"
             register={register}
             disabled={tag !== 'Sale'}
-            isRequired={tag === 'Sale'} // Conditionally require based on tag value
+            isRequired={tag === 'Sale'} // Pass conditional required prop
           />
 
-          {/* Cover Image URL */}
-          <InputField
-            label="Cover Image URL"
-            name="coverImage"
-            type="text"
-            placeholder="Cover Image URL"
-            register={register}
-          />
 
+          {/* Cover Image Upload */}
+          <div className="mb-4">
+            <label className="block text-sm font-semibold text-gray-700 mb-2">Cover Image</label>
+            <input type="file" accept="image/*" onChange={handleFileChange} className="mb-2 w-full" />
+            {imageFileName && <p className="text-sm text-gray-500">Selected: {imageFileName}</p>}
+          </div>
+
+          {/* Submit Button */}
           <button type="submit" className="w-full py-2 bg-blue-500 text-white font-bold rounded-md">
-            Update Book
+            {
+              isLoading ? <span>Adding...</span> : <span>Add Book</span>
+            }
           </button>
         </form>
       </div>
-      
     </section>
   )
 }
 
-export default UpdateBook
+export default AddBook;

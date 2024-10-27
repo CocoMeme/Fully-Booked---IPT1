@@ -13,9 +13,9 @@ import AdminRoute from "./AdminRoute";
 import AdminLogin from "../components/AdminLogin";
 import Layout from "../pages/dashboard/Layout";
 import Dashboard from "../pages/dashboard/Dashboard";
-import ManageBooks from "../pages/dashboard/ManageBooks";
-import AddBook from "../pages/dashboard/Add Book/AddBook";
-import UpdateBook from "../pages/dashboard/UpdateBook";
+import ManageBooks from "../pages/dashboard/Books/ManageBooks";
+import AddBook from "../pages/dashboard/Books/AddBook";
+import UpdateBook from "../pages/dashboard/Books/UpdateBook";
 
 const router = createBrowserRouter([
     {
