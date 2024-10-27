@@ -26,14 +26,15 @@ const Layout = () => {
         </a>
         <div className="flex-grow flex flex-col justify-between text-gray-500 bg-gray-800">
           <nav className="flex flex-col mx-4 my-6 space-y-4">
+
+            <Link to="/dashboard" className="inline-flex items-center justify-center py-3 hover:text-gray-400 hover:bg-gray-700 focus:text-gray-400 focus:bg-gray-700 rounded-lg">
+              <span className="sr-only">Dashboard</span>
+              <VscGraph className='size-6' />
+            </Link>
             <a href="#" className="inline-flex items-center justify-center py-3 hover:text-gray-400 hover:bg-gray-700 focus:text-gray-400 focus:bg-gray-700 rounded-lg">
               <span className="sr-only">Folders</span>
               <FaRegFolderOpen />
             </a>
-            <Link to="/dashboard" className="inline-flex items-center justify-center py-3 text-purple-600 bg-white rounded-lg">
-              <span className="sr-only">Dashboard</span>
-              <VscGraph className='size-6' />
-            </Link>
             <Link to="/dashboard/add-new-book" className="inline-flex items-center justify-center py-3 hover:text-gray-400 hover:bg-gray-700 focus:text-gray-400 focus:bg-gray-700 rounded-lg">
               <span className="sr-only">Add Book</span>
               <HiViewGridAdd className="size-6" />
@@ -57,14 +58,10 @@ const Layout = () => {
             <span className="sr-only">Menu</span>
             <RiFunctionAddLine />
           </button>
-          {/* <div className="relative sm:w-72 w-40 space-x-2">
-            <FaMagnifyingGlass className="absolute inline-block left-4 inset-y-2 " />
-            <input
-              type="text"
-              placeholder="Search a Book"
-              className="bg-[#EAEAEA] w-full py-1 md:px-8 px-6 rounded-md focus:outline-none"
-            />
-          </div> */}
+          <div className="sm:w-72 w-40 space-x-2 m-0">
+            <h1 className='ml-2 font-bold'>DASHBOARD</h1>
+            <p>Fully Booked</p>
+          </div>
           <div className="flex flex-shrink-0 items-center ml-auto">
             <button className="inline-flex items-center p-2 hover:bg-gray-100 focus:bg-gray-100 rounded-lg">
               <span className="sr-only">User Menu</span>
@@ -101,11 +98,11 @@ const Layout = () => {
 
         </header>
         <main className="p-6 sm:p-10 space-y-6 ">
-          <div className="flex flex-col space-y-6 md:space-y-0 md:flex-row justify-between">
+          {/* <div className="flex flex-col space-y-6 md:space-y-0 md:flex-row justify-between">
             <div className="mr-6">
               <h1 className="text-4xl font-semibold mb-2">Dashboard</h1>
               <h2 className="text-gray-600 ml-0.5">Fully Booked </h2>
-            </div>
+            </div> 
             <div className="flex flex-col md:flex-row items-start justify-end -mb-3">
               <Link to="/dashboard/manage-books" className="inline-flex px-5 py-3 text-purple-600 hover:text-purple-700 focus:text-purple-700 hover:bg-purple-100 focus:bg-purple-100 border border-purple-600 rounded-md mb-3">
                 <svg aria-hidden="true" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="flex-shrink-0 h-5 w-5 -ml-1 mt-0.5 mr-2">
@@ -120,7 +117,7 @@ const Layout = () => {
                 Add New Book
               </Link>
             </div>
-          </div>
+          </div> */}
           <Outlet />
         </main>
       </div>

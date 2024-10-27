@@ -1,5 +1,5 @@
 import React from 'react'
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, Outlet, useNavigate } from 'react-router-dom';
 import { useDeleteBookMutation, useFetchAllBooksQuery } from '../../redux/features/books/booksApi';
 
 const ManageBooks = () => {
@@ -28,7 +28,31 @@ const ManageBooks = () => {
     }
 
     return (
+
         <section className="py-1 bg-blueGray-50">
+            <main className="mb-5">
+                <div className="flex flex-col space-y-6 md:space-y-0 md:flex-row justify-between">
+                    <div className="mr-6">
+                        <h1 className="text-4xl font-bold mb-1">Book Management</h1>
+                        <h2 className="text-gray-600 ml-0.5">Admin Functionality</h2>
+                    </div>
+                    <div className="flex flex-col md:flex-row items-start justify-end -mb-3">
+                        <Link to="/dashboard/manage-books" className="inline-flex px-5 py-3 text-gray-600 hover:text-gray-700 focus:text-gray-700 hover:bg-gray-100 focus:bg-gray-100 border border-gray-600 rounded-md mb-3">
+                            <svg aria-hidden="true" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="flex-shrink-0 h-5 w-5 -ml-1 mt-0.5 mr-2">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                            </svg>
+                            Manage Books
+                        </Link>
+                        <Link to="/dashboard/add-new-book" className="inline-flex px-5 py-3 text-white bg-gray-600 hover:bg-gray-700 focus:bg-gray-700 rounded-md ml-6 mb-3">
+                            <svg aria-hidden="true" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="flex-shrink-0 h-6 w-6 text-white -ml-1 mr-2">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                            </svg>
+                            Add New Book
+                        </Link>
+                    </div>
+                </div>
+                <Outlet />
+            </main>
             <div className="w-full xl:w-8/12 mb-12 xl:mb-0 px-4 mx-auto">
                 <div className="relative flex flex-col min-w-0 break-words bg-white w-full mb-6 shadow-lg rounded ">
                     <div className="rounded-t mb-0 px-4 py-3 border-0">
@@ -108,6 +132,7 @@ const ManageBooks = () => {
                     </div>
                 </div>
             </div>
+
 
         </section>
     )
