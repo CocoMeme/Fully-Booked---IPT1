@@ -29,7 +29,6 @@ const bookSchema = new mongoose.Schema({
     type: Number,
     validate: {
       validator: function() {
-        // Only allow discountPrice to have a value if the tag is 'Sale'
         return this.tag === 'Sale' ? this.discountPrice != null : this.discountPrice == null;
       },
       message: props => `Discount price is only allowed when the tag is 'Sale'.`

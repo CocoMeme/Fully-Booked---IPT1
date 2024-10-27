@@ -7,28 +7,27 @@ import { Pagination, Navigation } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/pagination';
 import 'swiper/css/navigation';
-import { useFetchAllBooksQuery } from '../../redux/features/books/BooksApi';
-
-// import required modules
+import { useFetchAllBooksQuery } from '../../redux/features/books/booksApi';
 
 
 const categories = ["Choose a genre", "Adventure", "Fiction", "Business", "Action", "Comedy", "Drama", "Horror"]
 
 const TopSellers = () => {
 
-    const [selectedCategory, setSelectedCategory] = useState("Choose a genre"); // Set it to a string
+    const [selectedCategory, setSelectedCategory] = useState("Choose a genre");
 
 
     const {data: books =  []} = useFetchAllBooksQuery();
 
     const filteredBooks = selectedCategory === "Choose a genre" ? books : books.filter(book => 
-        book.category.toLowerCase() === selectedCategory.toLowerCase()) // Fix the logic to ensure proper comparison
+        book.category.toLowerCase() === selectedCategory.toLowerCase()) 
 
     console.log(filteredBooks)
 
     return (
         <div className='py-10'>
             <h2 className='text-3xl font-bold mb-6'>Top Sellers</h2>
+
             {/* category filter */}
             <div className='mb-8 flex items-center'> 
                 <select 
@@ -77,12 +76,7 @@ const TopSellers = () => {
                         </SwiperSlide>
                     ))
                 }
-
-                
-
             </Swiper>
-
-
         </div>
     )
 }

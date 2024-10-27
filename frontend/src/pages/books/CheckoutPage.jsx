@@ -5,6 +5,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext';
 import Swal from 'sweetalert2';
 import { useCreateOrderMutation } from '../../redux/features/orders/ordersApi';
+import Loading from '../../components/Loading';
 
 
 const CheckoutPage = () => {
@@ -54,9 +55,8 @@ const CheckoutPage = () => {
                   });
                 }
               });
+              if(isLoading)return <div><Loading/></div>
               navigate("/orders")
-            // console.log("Submitting new order:", newOrder);
-
         } catch (error) {
             console.error("Error placing an order", error)
             alert("Failed to place an order")

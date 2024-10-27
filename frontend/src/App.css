@@ -84,4 +84,27 @@
     color: transparent;
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4);
   }
+
+  /* For text Gradient Wave */
+
+  @keyframes gradientWave {
+    0% {
+      background-position: 0% 50%;
+    }
+    100% {
+      background-position: 200% 50%;
+    }
+  }
+  
+  .admin-heading {
+    font-size: 1.25rem;
+    font-weight: bold;
+    background: linear-gradient(90deg, green, red, yellow, green);
+    background-size: 200% 200%;
+    animation: gradientWave 3s linear infinite; /* Adjust speed as needed */
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  
   
