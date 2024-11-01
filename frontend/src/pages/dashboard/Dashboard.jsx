@@ -8,7 +8,7 @@ import SalesChart from '../dashboard/Charts/SalesChart'
 
 import { GoBook } from "react-icons/go";
 import { IoMdTrendingUp } from "react-icons/io";
-import { RiFireLine, RiShoppingCartLine  } from "react-icons/ri";
+import { RiFireLine, RiShoppingCartLine } from "react-icons/ri";
 
 
 const Dashboard = () => {
@@ -47,7 +47,7 @@ const Dashboard = () => {
             <section className="grid md:grid-cols-2 xl:grid-cols-4 gap-6">
                 <div className="flex items-center p-8 bg-white shadow rounded-lg">
                     <div className="inline-flex flex-shrink-0 items-center justify-center h-16 w-16 text-purple-600 bg-purple-100 rounded-full mr-6">
-                        <GoBook className='size-6'/>
+                        <GoBook className='size-6' />
                     </div>
                     <div>
                         <span className="block text-2xl font-bold">{data?.totalBooks ? data?.totalBooks : 0}</span>
@@ -56,7 +56,7 @@ const Dashboard = () => {
                 </div>
                 <div className="flex items-center p-8 bg-white shadow rounded-lg">
                     <div className="inline-flex flex-shrink-0 items-center justify-center h-16 w-16 text-green-600 bg-green-100 rounded-full mr-6">
-                        <IoMdTrendingUp className='size-6'/>
+                        <IoMdTrendingUp className='size-6' />
                     </div>
                     <div>
                         <span className="block text-2xl font-bold">
@@ -67,7 +67,7 @@ const Dashboard = () => {
                 </div>
                 <div className="flex items-center p-8 bg-white shadow rounded-lg">
                     <div className="inline-flex flex-shrink-0 items-center justify-center h-16 w-16 text-red-600 bg-red-100 rounded-full mr-6">
-                        <RiFireLine className='size-6'/>
+                        <RiFireLine className='size-6' />
                     </div>
                     <div>
                         <span className="inline-block text-2xl font-bold">{data?.hotBooks}</span>
@@ -96,18 +96,17 @@ const Dashboard = () => {
                 </div>
 
                 <div className="flex flex-col md:col-span-2 md:row-span-2 bg-white shadow rounded-lg">
-         
-                        <div className="px-6 py-5 font-semibold border-b border-gray-100">Montly Sales Chart</div>
-                        <div className="p-4 flex-grow">
-                            <div className="flex items-center justify-center h-full px-4 py-16 text-gray-400 text-3xl font-semibold bg-gray-100 border-2 border-gray-200 border-dashed rounded-md">
-                                <SalesChart monthlySales={data?.monthlySales || []} />
-                            </div>
+                    <div className="px-6 py-5 font-semibold border-b border-gray-100">Montly Sales Chart</div>
+                    <div className="p-4 flex-grow">
+                        <div className="flex items-center justify-center h-full px-4 py-16 text-gray-400 text-3xl font-semibold bg-gray-100 border-2 border-gray-200 border-dashed rounded-md">
+                            <SalesChart monthlySales={data?.monthlySales || []} />
                         </div>
-
-                    
+                    </div>
                 </div>
 
-                <div className="flex items-center p-8 bg-white shadow rounded-lg">
+                
+
+                {/* <div className="flex items-center p-8 bg-white shadow rounded-lg">
                     <div className="inline-flex flex-shrink-0 items-center justify-center h-16 w-16 text-yellow-600 bg-yellow-100 rounded-full mr-6">
                         <svg aria-hidden="true" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="h-6 w-6">
                             <path fill="#fff" d="M12 14l9-5-9-5-9 5 9 5z" />
@@ -130,7 +129,7 @@ const Dashboard = () => {
                         <span className="block text-2xl font-bold">139</span>
                         <span className="block text-gray-500">Website visits (last day)</span>
                     </div>
-                </div>
+                </div> */}
                 {/* <div className="row-span-3 bg-white shadow rounded-lg">
                     <div className="flex items-center justify-between px-6 py-5 font-semibold border-b border-gray-100">
                         <span>Users by average order</span>

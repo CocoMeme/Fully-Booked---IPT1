@@ -10,9 +10,9 @@ const userSchema = new mongoose.Schema({
     email: {
         type: String,
         required: true,
-        unique: true,  // Ensure email is unique
-        lowercase: true,  // Convert email to lowercase to avoid case sensitivity issues
-        trim: true,  // Remove extra spaces
+        unique: true, 
+        lowercase: true,
+        trim: true, 
     },
     password: {
         type: String,
@@ -21,10 +21,10 @@ const userSchema = new mongoose.Schema({
     role: {
         type: String,
         enum: ['customer', 'admin', 'courier'],
-        default: 'customer',  // Default role is 'customer'
+        default: 'customer',
     },
     avatar: {
-        type: String,  // URL or path to the avatar image
+        type: String, 
         default: null,
     },
     address: {

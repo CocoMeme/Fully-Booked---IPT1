@@ -28,7 +28,7 @@ const UpdateBook = () => {
       setValue('price', bookData.price);
       setValue('discountPrice', bookData.discountPrice);
       setValue('coverImage', bookData.coverImage);
-      setTag(bookData.tag);  // Set initial tag state
+      setTag(bookData.tag); 
     }
   }, [bookData, setValue]);
 
