@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useForm } from "react-hook-form";
 import { useAuth } from '../../context/AuthContext';
+import { Link } from 'react-router-dom';
 
 const Profile = () => {
     const { currentUser } = useAuth();
@@ -155,11 +156,12 @@ const Profile = () => {
 
                                     <div className="md:col-span-5 text-end">
                                         <div className="inline-flex items-end mr-5">
-                                            <button
-                                                type="submit"
-                                                className="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded">
+
+                                            <Link to="/apply-courier"
+                                                className="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded">                      
                                                 Apply as Courier
-                                            </button>
+                                            </Link>
+                                            
                                         </div>                                        
                                         <div className="inline-flex items-end">
                                             <button

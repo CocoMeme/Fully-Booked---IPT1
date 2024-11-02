@@ -1,7 +1,6 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 
-// Define the schema for the User model
 const userSchema = new mongoose.Schema({
     username: {
         type: String,
@@ -49,15 +48,51 @@ const userSchema = new mongoose.Schema({
         type: String,
         default: null,
     },
+
+    // FOR COURIER FIELDS
+    courierApplicationStatus: {
+        type: String,
+        enum: ['pending', 'approved', 'rejected'],
+        default: null,
+    },
+    applicationDate: {
+        type: Date,
+        default: null,
+    },
+    approvalDate: {
+        type: Date,
+        default: null,
+    },
+    isAvailable: {
+        type: Boolean,
+        default: false,
+    },
+    vehicleInfo: {
+        type: String,
+        default: null,
+    },
+    serviceArea: {
+        country: {
+            type: String,
+            default: null,
+        },
+        city: {
+            type: String,
+            default: null,
+        },
+    },
+    validId: {
+        type: String,
+        default: null,
+    },
 }, { timestamps: true });
 
-// Pre-save middleware to hash passwords before saving
 userSchema.pre('save', async function(next) {
     if (!this.isModified('password')) return next();
 
     try {
-        const salt = await bcrypt.genSalt(10);  // Generate salt
-        this.password = await bcrypt.hash(this.password, salt);  // Hash password
+        const salt = await bcrypt.genSalt(10); 
+        this.password = await bcrypt.hash(this.password, salt); 
         next();
     } catch (err) {
         next(err);
@@ -69,6 +104,5 @@ userSchema.methods.comparePassword = async function(candidatePassword) {
     return await bcrypt.compare(candidatePassword, this.password);
 };
 
-// Define the User model using the schema
 const User = mongoose.model('User', userSchema);
 module.exports = User;

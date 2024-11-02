@@ -15,8 +15,21 @@ export default {
       fontFamily:{
         'primary': ["Afacad Flux", "sans-serif"],
         'secondary': ["Afacad Flux", "sans-serif"]
-      }
+      },
+      backgroundImage: {
+        'pattern': "url('/android-chrome-512x512.jpg')", // Update with your image path
+      },
+      keyframes: {
+        'move-diagonal': {
+          '0%': { backgroundPosition: '0 0' },
+          '100%': { backgroundPosition: '200px 200px' }, // Adjust movement distance as needed
+        },
+      },
+      animation: {
+        'move-diagonal': 'move-diagonal 15s linear infinite',
+      },
     },
   },
   plugins: [],
 }
+

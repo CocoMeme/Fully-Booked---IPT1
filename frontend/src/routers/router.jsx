@@ -1,6 +1,6 @@
-import {createBrowserRouter} from "react-router-dom";
+import { createBrowserRouter } from "react-router-dom";
 import App from "../App";
-import Home from "../pages/home/Home"
+import Home from "../pages/home/Home";
 import Login from "../components/Login";
 import Register from "../components/Register";
 import CartPage from "../pages/books/CartPage";
@@ -16,6 +16,8 @@ import Dashboard from "../pages/dashboard/Dashboard";
 import ManageBooks from "../pages/dashboard/Books/ManageBooks";
 import AddBook from "../pages/dashboard/Books/AddBook";
 import UpdateBook from "../pages/dashboard/Books/UpdateBook";
+import RegisterCourier from "../pages/courier/RegisterCourier";
+import CourierRoute from "./CourierRoute";
 
 const router = createBrowserRouter([
     {
@@ -57,8 +59,11 @@ const router = createBrowserRouter([
         {
           path: "/profile",
           element: <Profile/>
+        },
+        {
+          path: "/apply-courier",
+          element: <PrivateRoute><RegisterCourier/></PrivateRoute>  // Courier application page only accessible to logged-in users
         }
-
       ]
     },
     {
@@ -71,7 +76,6 @@ const router = createBrowserRouter([
           <Layout/>
       </AdminRoute>,
       children: [
-        // No "/" because we use relative and absolute path
         {
           path: "",
           element: <AdminRoute><Dashboard/></AdminRoute>
@@ -95,7 +99,21 @@ const router = createBrowserRouter([
           </AdminRoute>
         }
       ]
+    },
+    {
+      path: "/courier",
+      element: <CourierRoute>
+        <Layout />
+      </CourierRoute>,
+      children: [
+        // Add courier-specific routes here, e.g., courier dashboard
+        {
+          path: "",
+          element: <CourierRoute><Dashboard/></CourierRoute>
+        },
+        // Other potential routes for couriers, like orders assigned to them, etc.
+      ]
     }
   ]);
 
-  export default router
+export default router;
