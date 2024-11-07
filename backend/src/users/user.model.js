@@ -2,6 +2,11 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 
 const userSchema = new mongoose.Schema({
+    firebaseUid:{
+        type: String,
+        unique: true,
+        required: true
+    },
     username: {
         type: String,
         unique: true

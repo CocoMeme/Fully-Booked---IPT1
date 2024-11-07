@@ -1,70 +1,79 @@
 import { createContext, useContext, useEffect, useState } from "react";
-import { auth } from "../firebase/firebase.config"
-import { createUserWithEmailAndPassword, GoogleAuthProvider, onAuthStateChanged, signInWithEmailAndPassword, signInWithPopup, signOut } from "firebase/auth";
+import { auth } from "../firebase/firebase.config";
+import {
+  createUserWithEmailAndPassword,
+  GoogleAuthProvider,
+  onAuthStateChanged,
+  signInWithEmailAndPassword,
+  signInWithPopup,
+  signOut
+} from "firebase/auth";
+import axios from "axios"; 
 
-const AuthContenxt = createContext();
+const AuthContext = createContext();
 
 export const useAuth = () => {
-    return useContext(AuthContenxt)
-}
+  return useContext(AuthContext);
+};
 
 const googleProvider = new GoogleAuthProvider();
 
 // Auth Provider
-export const AuthProvider = ({children}) => {
+export const AuthProvider = ({ children }) => {
+  const [currentUser, setCurrentUser] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-    const [currentUser, setCurrentUser] = useState(null);
-    const [loading, setLoading] = useState(true);
+  // Register User
+  const registerUser = async (username, email, password) => {
+    try {
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const firebaseUser = userCredential.user;
 
-    // Register User
-    const registerUser = async (email, password) => {
-        return await createUserWithEmailAndPassword(auth, email, password)
+      await axios.post("http://localhost:5000/api/auth/register", {
+        username,
+        email,
+        password,
+        firebaseUid: firebaseUser.uid 
+      });
+
+      console.log("User registered successfully in MongoDB and Firebase");
+    } catch (error) {
+      console.error("Error registering user:", error);
     }
+  };
 
-    // Login User
-    const loginUser = async (email, password) => {
-        return await signInWithEmailAndPassword(auth, email, password)
-    }
+  // Login User
+  const loginUser = async (email, password) => {
+    return await signInWithEmailAndPassword(auth, email, password);
+  };
 
-    // Sign Up with Google
-    const signInWithGoogle = async () => {
-        return await signInWithPopup(auth, googleProvider)
-    }
+  // Sign Up with Google
+  const signInWithGoogle = async () => {
+    return await signInWithPopup(auth, googleProvider);
+  };
 
-    // Logout User
-    const logout = () => {
-        return signOut(auth)
-    }
+  // Logout User
+  const logout = () => {
+    return signOut(auth);
+  };
 
-    // Manage Users
-    useEffect(() => {
-        const unsubscribe = onAuthStateChanged(auth, (user) => {
-            setCurrentUser(user);
-            setLoading(false);
+  // Manage Users
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setCurrentUser(user);
+      setLoading(false);
+    });
+    return () => unsubscribe();
+  }, []);
 
-            if(user) {
-                const {email, displayName, photoURL} = user;
-                const userData = {
-                    email, username: displayName, photo: photoURL
-                }
-            }
-        })
-        return () => unsubscribe();
-    }, [])
+  const value = {
+    currentUser,
+    loading,
+    registerUser,
+    loginUser,
+    signInWithGoogle,
+    logout
+  };
 
-    const value = {
-        currentUser,
-        loading,
-        registerUser,
-        loginUser,
-        signInWithGoogle,
-        logout
-    }
-    
-    return (
-        <AuthContenxt.Provider value={value}>
-            {children}
-        </AuthContenxt.Provider>
-    )
-}
- 
+  return <AuthContext.Provider value={value}>{!loading && children}</AuthContext.Provider>;
+};

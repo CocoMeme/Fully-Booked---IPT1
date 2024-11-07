@@ -1,4 +1,66 @@
-const User = require('../users/user.model');  // Adjust the path based on your directory structure
+const jwt = require('jsonwebtoken');
+const User = require('../users/user.model'); 
+
+const JWT_SECRET = process.env.JWT_SECRET_KEY;
+
+exports.registerUser = async (req, res, next) => {
+    const { username, email, password, firebaseUid } = req.body;
+    console.log("Register User Request Body:", req.body);
+    
+    try {
+        if (!username || !email || !password) {
+            return res.status(400).json({ message: "All fields are required" });
+        }
+
+        const newUser = new User({ username, email, password, firebaseUid});
+        await newUser.save();
+
+        const token = jwt.sign(
+            { id: newUser._id, email: newUser.email, role: newUser.role, firebaseUid: newUser.firebaseUid },
+            JWT_SECRET,
+            { expiresIn: '1h' }
+        );
+
+        res.status(201).json({ message: "User created successfully!", token });
+    } catch (error) {
+        console.error("Error in registerUser:", error); // Log any errors encountered
+        next(error);
+    }
+};
+
+
+// Admin Login
+exports.loginAdmin = async (req, res) => {
+    const {username, password} = req.body
+    try {
+        const admin = await User.findOne({username})
+        if(!admin){
+            return res.status(404).send({message: "Admin not found!"})
+        }
+        if(admin.password !== password){
+            return res.status(401).send({message: "Invalid password"})
+        }
+
+        const token = jwt.sign(
+            {id: admin._id, username: admin.username, role: admin.role},
+            JWT_SECRET,
+            {expiresIn: "1h"}
+        )
+
+        return res.status(200).json({
+            message: "Authentican successfull",
+            token: token,
+            user: {
+                username: admin.username,
+                role: admin.role
+            }
+        })
+
+    } catch (error) {
+        console.error("Failed to login as admin", error)
+        res.status(401).send({message: "Failed to login as admin"})
+    }
+}
 
 // Submit Courier Application
 exports.submitCourierApplication = async (req, res) => {

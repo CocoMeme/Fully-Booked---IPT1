@@ -7,10 +7,24 @@ require('dotenv').config()
 
 // MIDDLEWARE
 app.use(express.json());
+
+app.use((err, req, res, next)=>  {
+  const statusCode = err.statusCode || 500
+  const message = err.message || 'Internal Server Error!'
+  return res.status(statusCode).json({
+    success: false,
+    statusCode,
+    message
+  })
+})
+
 app.use(cors({
   origin: ['http://localhost:5173'],
   credentials: true
 }))
+
+
+
 
 // ROUTES
 const bookRoutes = require('./src/books/book.route');
