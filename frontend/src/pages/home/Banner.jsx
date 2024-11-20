@@ -24,11 +24,9 @@ const Banner = () => {
                 </div>
             </div>
 
-
-
             <div className='ml-6'>
                 <h1 className='md:text-5xl text-lg font-medium mb-7'>Newly Released Books!</h1>
-                <h3 className='mb-5'>This is a project done by <strong>Andrei Co</strong>  & <strong>Rean Joy Cicat</strong>.</h3>
+                <h3 className='mb-5'>This is a project done by <strong>Andrei Co</strong> & <strong>Rean Joy Cicat</strong>.</h3>
                 <p className='mb-10'>
                     Its time to update your reading list with some of the latest and greatest releases in the literary world. 
                     From heart-pumping thrillers to captivating memoirs, this weeks new releases offer something for everyone

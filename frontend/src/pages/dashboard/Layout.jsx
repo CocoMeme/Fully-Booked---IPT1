@@ -3,13 +3,15 @@ import { Link, Outlet } from 'react-router-dom'
 
 import { IoIosStats } from "react-icons/io";
 import { GoGear } from "react-icons/go";
-import { FaRegFolderOpen } from "react-icons/fa6";
-import { RiFunctionAddFill, RiFunctionAddLine } from "react-icons/ri";
+import { RiFunctionAddLine } from "react-icons/ri";
 import { BiSolidBookOpen } from "react-icons/bi";
 
 import { PiFootballHelmetFill  } from "react-icons/pi";
 import { HiUsers } from "react-icons/hi";
 import { FaMoneyBillWave } from "react-icons/fa";
+
+import { } from '@mui/icons-material';
+
 
 const Layout = () => {
 
@@ -33,11 +35,6 @@ const Layout = () => {
               <span className="sr-only">Dashboard</span>
               <IoIosStats className='size-6' />
             </Link>
-
-            {/* <Link to="/dashboard/add-new-book" className="inline-flex items-center justify-center py-3 hover:text-gray-400 hover:bg-gray-700 focus:text-gray-400 focus:bg-gray-700 rounded-lg">
-              <span className="sr-only">Add Book</span>
-              <RiFunctionAddFill className="size-6" />
-            </Link> */}
 
             <Link to="/dashboard/manage-books" className="inline-flex items-center justify-center py-3 hover:text-gray-400 hover:bg-gray-700 focus:text-gray-400 focus:bg-gray-700 rounded-lg">
               <span className="sr-only">All Books</span>

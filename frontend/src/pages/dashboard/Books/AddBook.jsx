@@ -1,60 +1,71 @@
-import React, { useState } from 'react'
-import InputField from './InputField'
-import SelectField from './SelectField'
-import { useForm } from 'react-hook-form';
-import Swal from 'sweetalert2';
-import { useAddBookMutation } from '../../../redux/features/books/booksApi';
-import { Link, Outlet } from 'react-router-dom';
+import React, { useState } from "react";
+import { useForm, Controller } from "react-hook-form";
+import Swal from "sweetalert2";
+import { useAddBookMutation } from "../../../redux/features/books/booksApi";
+import { Link, Outlet } from "react-router-dom";
+import {
+  Box,
+  Button,
+  CircularProgress,
+  MenuItem,
+  Select,
+  TextField,
+  Typography,
+} from "@mui/material";
 
 const AddBook = () => {
-  const { register, handleSubmit, formState: { errors }, reset } = useForm();
-  const [imageFile, setimageFile] = useState(null);
-  const [addBook, { isLoading, isError }] = useAddBookMutation()
-  const [imageFileName, setimageFileName] = useState('');
-  const [tag, setTag] = useState('');
+  const { control, handleSubmit, watch, reset } = useForm({
+    defaultValues: {
+      title: "",
+      description: "",
+      category: "",
+      tag: "",
+      price: "",
+      discountPrice: "",
+    },
+  });
+
+  const [imageFile, setImageFile] = useState(null);
+  const [imageFileName, setImageFileName] = useState("");
+  const [addBook, { isLoading }] = useAddBookMutation();
+  const tag = watch("tag");
 
   const onSubmit = async (data) => {
-    // Exclude discountPrice if tag is not "Sale"
     const newBookData = {
       ...data,
       coverImage: imageFileName,
-      discountPrice: tag === 'Sale' ? data.discountPrice : undefined, // Only include discountPrice if tag is "Sale"
-    }
+      discountPrice: tag === "Sale" ? data.discountPrice : undefined,
+    };
 
     try {
       await addBook(newBookData).unwrap();
       Swal.fire({
-        title: "Book added",
-        text: "Your book is uploaded successfully!",
+        title: "Book Added",
+        text: "Your book has been added successfully!",
         icon: "success",
-        showCancelButton: true,
-        confirmButtonColor: "#3085d6",
-        cancelButtonColor: "#d33",
-        confirmButtonText: "Confirm!"
       });
       reset();
-      setimageFileName('');
-      setimageFile(null);
+      setImageFile(null);
+      setImageFileName("");
     } catch (error) {
-      console.error(error);
-      alert("Failed to add book. Please try again.")
+      Swal.fire({
+        title: "Error",
+        text: "Failed to add the book. Please try again.",
+        icon: "error",
+      });
     }
-  }
+  };
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      setimageFile(file);
-      setimageFileName(file.name);
+      setImageFile(file);
+      setImageFileName(file.name);
     }
-  }
-
-  const handleTagChange = (e) => {
-    setTag(e.target.value); // Update tag state
-  }
+  };
 
   return (
-    <section className="py-1 bg-blueGray-50">
+    <section>
       <main className="mb-7 w-full xl:w-10/12 xl:mb-7 px-4 mx-auto">
         <div className="flex flex-col space-y-6 md:space-y-0 md:flex-row justify-between">
           <div className="mr-6">
@@ -62,16 +73,16 @@ const AddBook = () => {
             <h2 className="text-gray-600 ml-0.5">Admin Functionality</h2>
           </div>
           <div className="flex flex-col md:flex-row items-start justify-end -mb-3">
-            <Link to="/dashboard/manage-books" className="inline-flex px-5 py-3 text-gray-600 hover:text-gray-700 focus:text-gray-700 hover:bg-gray-100 focus:bg-gray-100 border border-gray-600 rounded-md mb-3">
-              <svg aria-hidden="true" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="flex-shrink-0 h-5 w-5 -ml-1 mt-0.5 mr-2">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-              </svg>
+            <Link
+              to="/dashboard/manage-books"
+              className="inline-flex px-5 py-3 text-gray-600 hover:text-gray-700 focus:text-gray-700 hover:bg-gray-100 focus:bg-gray-100 border border-gray-600 rounded-md mb-3"
+            >
               Manage Books
             </Link>
-            <Link to="/dashboard/add-new-book" className="inline-flex px-5 py-3 text-white bg-gray-600 hover:bg-gray-700 focus:bg-gray-700 rounded-md ml-6 mb-3">
-              <svg aria-hidden="true" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="flex-shrink-0 h-6 w-6 text-white -ml-1 mr-2">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-              </svg>
+            <Link
+              to="/dashboard/add-new-book"
+              className="inline-flex px-5 py-3 text-white bg-gray-600 hover:bg-gray-700 focus:bg-gray-700 rounded-md ml-6 mb-3"
+            >
               Add New Book
             </Link>
           </div>
@@ -79,96 +90,156 @@ const AddBook = () => {
         <Outlet />
       </main>
 
-      <div className="max-w-lg mx-auto md:p-6 p-3 bg-white rounded-lg shadow-md">
+      <Box
+        component="form"
+        onSubmit={handleSubmit(onSubmit)}
+        maxWidth="sm"
+        mx="auto"
+        p={3}
+        boxShadow={3}
+        borderRadius={2}
+        bgcolor="white"
+      >
+        <Typography variant="h4" fontWeight="bold" textAlign="center" mb={3}>
+          Add New Book
+        </Typography>
 
-        <h2 className="text-2xl font-bold text-gray-800 mb-4">Add New Book</h2>
+        {/* Title */}
+        <Controller
+          name="title"
+          control={control}
+          render={({ field, fieldState: { error } }) => (
+            <TextField
+              {...field}
+              label="Title"
+              fullWidth
+              margin="normal"
+              error={!!error}
+              helperText={error?.message}
+            />
+          )}
+        />
 
-        {/* Form starts here */}
-        <form onSubmit={handleSubmit(onSubmit)} className=''>
-          {/* Title */}
-          <InputField
-            label="Title"
-            name="title"
-            placeholder="Enter book title"
-            register={register}
-          />
+        {/* Description */}
+        <Controller
+          name="description"
+          control={control}
+          render={({ field, fieldState: { error } }) => (
+            <TextField
+              {...field}
+              label="Description"
+              multiline
+              rows={4}
+              fullWidth
+              margin="normal"
+              error={!!error}
+              helperText={error?.message}
+            />
+          )}
+        />
 
-          {/* Description */}
-          <InputField
-            label="Description"
-            name="description"
-            placeholder="Enter book description"
-            type="textarea"
-            register={register}
-          />
+        {/* Category */}
+        <Controller
+          name="category"
+          control={control}
+          render={({ field, fieldState: { error } }) => (
+            <Select
+              {...field}
+              fullWidth
+              displayEmpty
+              margin="normal"
+              error={!!error}
+            >
+              <MenuItem value="">Choose A Category</MenuItem>
+              <MenuItem value="Business">Business</MenuItem>
+              <MenuItem value="Comedy">Comedy</MenuItem>
+              <MenuItem value="Fiction">Fiction</MenuItem>
+              <MenuItem value="Horror">Horror</MenuItem>
+              <MenuItem value="Adventure">Adventure</MenuItem>
+            </Select>
+          )}
+        />
 
-          {/* Category */}
-          <SelectField
-            label="Category"
-            name="category"
-            options={[
-              { value: '', label: 'Choose A Category' },
-              { value: 'Business', label: 'Business' },
-              { value: 'Comedy', label: 'Comedy' },
-              { value: 'Fiction', label: 'Fiction' },
-              { value: 'Horror', label: 'Horror' },
-              { value: 'Adventure', label: 'Adventure' },
-            ]}
-            register={register}
-          />
+        {/* Price */}
+        <Controller
+          name="price"
+          control={control}
+          render={({ field, fieldState: { error } }) => (
+            <TextField
+              {...field}
+              label="Price"
+              type="number"
+              fullWidth
+              margin="normal"
+              error={!!error}
+              helperText={error?.message}
+            />
+          )}
+        />
 
-          {/* Price */}
-          <InputField
-            label="Price"
-            name="price"
-            type="number"
-            placeholder="Price"
-            register={register}
-          />
+        {/* Tag */}
+        <Controller
+          name="tag"
+          control={control}
+          render={({ field }) => (
+            <Select {...field} fullWidth displayEmpty margin="normal">
+              <MenuItem value="">Choose A Tag</MenuItem>
+              <MenuItem value="New">New</MenuItem>
+              <MenuItem value="Hot">Hot</MenuItem>
+              <MenuItem value="Sale">Sale</MenuItem>
+            </Select>
+          )}
+        />
 
-          {/* Tag */}
-          <SelectField
-            label="Tag"
-            name="tag"
-            options={[
-              { value: '', label: 'Choose A Tag' },
-              { value: 'New', label: 'New' },
-              { value: 'Hot', label: 'Hot' },
-              { value: 'Sale', label: 'Sale' },
-            ]}
-            register={register}
-            onChange={handleTagChange}
-          />
-
-          {/* Discount Price */}
-          <InputField
-            label="Discount Price"
+        {/* Discount Price */}
+        {tag === "Sale" && (
+          <Controller
             name="discountPrice"
-            type="number"
-            placeholder="Discount Price"
-            register={register}
-            disabled={tag !== 'Sale'}
-            isRequired={tag === 'Sale'} // Pass conditional required prop
+            control={control}
+            render={({ field, fieldState: { error } }) => (
+              <TextField
+                {...field}
+                label="Discount Price"
+                type="number"
+                fullWidth
+                margin="normal"
+                error={!!error}
+                helperText={error?.message}
+              />
+            )}
           />
+        )}
 
+        {/* Cover Image Upload */}
+        <Box mb={2}>
+          <Typography variant="subtitle1" mb={1}>
+            Cover Image
+          </Typography>
+          <input
+            type="file"
+            accept="image/*"
+            onChange={handleFileChange}
+            style={{ display: "block", marginBottom: "8px" }}
+          />
+          {imageFileName && (
+            <Typography variant="body2" color="textSecondary">
+              Selected: {imageFileName}
+            </Typography>
+          )}
+        </Box>
 
-          {/* Cover Image Upload */}
-          <div className="mb-4">
-            <label className="block text-sm font-semibold text-gray-700 mb-2">Cover Image</label>
-            <input type="file" accept="image/*" onChange={handleFileChange} className="mb-2 w-full" />
-            {imageFileName && <p className="text-sm text-gray-500">Selected: {imageFileName}</p>}
-          </div>
-
-          {/* Submit Button */}
-          <button type="submit" className="w-full py-2 bg-blue-500 text-white font-bold rounded-md">
-            {
-              isLoading ? <span>Adding...</span> : <span>Add Book</span>
-            }
-          </button>
-        </form>
-      </div>
+        <Button
+          type="submit"
+          variant="contained"
+          color="primary"
+          fullWidth
+          disabled={isLoading}
+        >
+          {isLoading ? <CircularProgress size={24} color="inherit" /> : "Add Book"}
+        </Button>
+      </Box>
     </section>
-  )
-}
+  );
+};
 
 export default AddBook;

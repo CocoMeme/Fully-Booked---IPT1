@@ -62,7 +62,7 @@ const router = createBrowserRouter([
         },
         {
           path: "/apply-courier",
-          element: <PrivateRoute><RegisterCourier/></PrivateRoute>  // Courier application page only accessible to logged-in users
+          element: <PrivateRoute><RegisterCourier/></PrivateRoute>
         }
       ]
     },
@@ -106,12 +106,10 @@ const router = createBrowserRouter([
         <Layout />
       </CourierRoute>,
       children: [
-        // Add courier-specific routes here, e.g., courier dashboard
         {
           path: "",
           element: <CourierRoute><Dashboard/></CourierRoute>
         },
-        // Other potential routes for couriers, like orders assigned to them, etc.
       ]
     }
   ]);
