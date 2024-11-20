@@ -29,9 +29,9 @@ const SingleBook = () => {
                 <div className="">
                     <div>
                         <img
-                        src={`${getImgUrl(book.coverImage)}`}
-                        alt={book.title}
-                        className="mb-8"
+                            src={book?.coverImage} // Use the Cloudinary URL directly
+                            alt={book?.title}
+                            className="w-25 h-auto bg-cover p-2 rounded-md cursor-pointer hover:scale-105 transition-all duration-200"
                         />
                     </div>
 

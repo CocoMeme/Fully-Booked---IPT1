@@ -1,18 +1,19 @@
 const jwt = require('jsonwebtoken');
+const bcrypt = require("bcrypt");
 const User = require('../users/user.model'); 
 
 const JWT_SECRET = process.env.JWT_SECRET_KEY;
 
 exports.registerUser = async (req, res, next) => {
     const { username, email, password, firebaseUid } = req.body;
-    console.log("Register User Request Body:", req.body);
-    
+
     try {
         if (!username || !email || !password) {
             return res.status(400).json({ message: "All fields are required" });
         }
 
-        const newUser = new User({ username, email, password, firebaseUid});
+        const hashedPassword = await bcrypt.hash(password, 10); // Hash password
+        const newUser = new User({ username, email, password: hashedPassword, firebaseUid });
         await newUser.save();
 
         const token = jwt.sign(
@@ -29,38 +30,42 @@ exports.registerUser = async (req, res, next) => {
 };
 
 
+
 // Admin Login
 exports.loginAdmin = async (req, res) => {
-    const {username, password} = req.body
+    const { username, password } = req.body;
+
     try {
-        const admin = await User.findOne({username})
-        if(!admin){
-            return res.status(404).send({message: "Admin not found!"})
+        const admin = await User.findOne({ username });
+        if (!admin) {
+            return res.status(404).send({ message: "Admin not found!" });
         }
-        if(admin.password !== password){
-            return res.status(401).send({message: "Invalid password"})
+
+        if (admin.role !== "admin") {
+            return res.status(403).send({ message: "Access denied. Not an admin." });
+        }
+
+        const isPasswordValid = await bcrypt.compare(password, admin.password);
+        if (!isPasswordValid) {
+            return res.status(401).send({ message: "Invalid password" });
         }
 
         const token = jwt.sign(
-            {id: admin._id, username: admin.username, role: admin.role},
+            { id: admin._id, username: admin.username, role: admin.role },
             JWT_SECRET,
-            {expiresIn: "1h"}
-        )
+            { expiresIn: "1h" }
+        );
 
         return res.status(200).json({
-            message: "Authentican successfull",
-            token: token,
-            user: {
-                username: admin.username,
-                role: admin.role
-            }
-        })
-
+            message: "Authentication successful",
+            token,
+            user: { username: admin.username, role: admin.role },
+        });
     } catch (error) {
-        console.error("Failed to login as admin", error)
-        res.status(401).send({message: "Failed to login as admin"})
+        console.error("Failed to login as admin", error);
+        return res.status(500).send({ message: "Failed to login as admin" });
     }
-}
+};
 
 // Submit Courier Application
 exports.submitCourierApplication = async (req, res) => {

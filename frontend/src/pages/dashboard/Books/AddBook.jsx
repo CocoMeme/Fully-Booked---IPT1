@@ -12,6 +12,7 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
+import getBaseUrl from "../../../utils/baseURL";
 
 const AddBook = () => {
   const { control, handleSubmit, watch, reset } = useForm({
@@ -31,31 +32,60 @@ const AddBook = () => {
   const tag = watch("tag");
 
   const onSubmit = async (data) => {
-    const newBookData = {
-      ...data,
-      coverImage: imageFileName,
-      discountPrice: tag === "Sale" ? data.discountPrice : undefined,
-    };
-
+    if (!imageFile) {
+      Swal.fire({
+        title: "Error",
+        text: "Please upload a cover image!",
+        icon: "error",
+      });
+      return;
+    }
+  
+    const formData = new FormData();
+    formData.append("file", imageFile); // Append image file
+    formData.append("upload_preset", "fully-booked"); // Cloudinary preset if required
+  
     try {
+      // Upload the image to the backend/Cloudinary
+      const uploadResponse = await fetch(`${getBaseUrl()}/api/books/upload-cover`, {
+        method: "POST",
+        body: formData,
+      });
+  
+      if (!uploadResponse.ok) {
+        throw new Error("Failed to upload the cover image.");
+      }
+  
+      const { coverImage } = await uploadResponse.json(); // Get Cloudinary URL from the response
+  
+      // Include the coverImage URL in book data
+      const newBookData = {
+        ...data,
+        coverImage, // Cloudinary URL
+        discountPrice: tag === "Sale" ? data.discountPrice : undefined,
+      };
+  
+      // Send book details to the backend
       await addBook(newBookData).unwrap();
+  
       Swal.fire({
         title: "Book Added",
         text: "Your book has been added successfully!",
         icon: "success",
       });
+  
       reset();
       setImageFile(null);
       setImageFileName("");
     } catch (error) {
       Swal.fire({
         title: "Error",
-        text: "Failed to add the book. Please try again.",
+        text: error.message || "Failed to add the book. Please try again.",
         icon: "error",
       });
     }
   };
-
+  
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -221,12 +251,20 @@ const AddBook = () => {
             onChange={handleFileChange}
             style={{ display: "block", marginBottom: "8px" }}
           />
+          {imageFile && (
+            <img
+              src={URL.createObjectURL(imageFile)}
+              alt="Cover Preview"
+              style={{ width: "100px", height: "auto", marginTop: "8px" }}
+            />
+          )}
           {imageFileName && (
             <Typography variant="body2" color="textSecondary">
               Selected: {imageFileName}
             </Typography>
           )}
         </Box>
+
 
         <Button
           type="submit"

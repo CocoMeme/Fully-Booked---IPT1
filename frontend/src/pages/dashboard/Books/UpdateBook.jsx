@@ -30,21 +30,19 @@ const validationSchema = yup.object().shape({
   discountPrice: yup
     .number()
     .nullable()
-    .when("tag", {
-      is: "Sale",
-      then: yup
-        .number()
-        .required("Discount price is required when tag is 'Sale'")
-        .positive("Discount price must be greater than 0"),
-      otherwise: yup.number().nullable(),
-    }),
-  coverImage: yup.string().url("Enter a valid URL").required("Cover image URL is required"),
+    .when("tag", (tag, schema) =>
+      tag === "Sale"
+        ? schema.required("Discount price is required when tag is 'Sale'").positive("Discount price must be greater than 0")
+        : schema.nullable()
+    ),
 });
+
 
 const UpdateBook = () => {
   const { id } = useParams();
   const { data: bookData, isLoading, isError, refetch } = useFetchBookByIdQuery(id);
-  const [updateBook] = useUpdateBookMutation();
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [uploading, setUploading] = useState(false);
 
   const { control, handleSubmit, setValue, reset, watch } = useForm({
     resolver: yupResolver(validationSchema),
@@ -75,34 +73,64 @@ const UpdateBook = () => {
     }
   }, [bookData, reset]);
 
-  const onSubmit = async (data) => {
-    const updateBookData = {
-      ...data,
-      price: Number(data.price),
-      discountPrice: tag === "Sale" ? Number(data.discountPrice) : null,
-    };
+  // const uploadImageToCloudinary = async (file) => {
+  //   const formData = new FormData();
+  //   formData.append("file", file);
+  //   formData.append("upload_preset", "book_upload"); // Replace with your Cloudinary upload preset
 
+  //   try {
+  //     setUploading(true);
+  //     const response = await axios.post("https://api.cloudinary.com/v1_1/your_cloud_name/image/upload", formData);
+  //     setUploading(false);
+  //     return response.data.secure_url; // Return the secure URL
+  //   } catch (error) {
+  //     setUploading(false);
+  //     Swal.fire({
+  //       title: "Error",
+  //       text: "Failed to upload image to Cloudinary.",
+  //       icon: "error",
+  //     });
+  //     throw error;
+  //   }
+  // };
+
+  const onSubmit = async (data) => {
     try {
-      await axios.put(`${getBaseUrl()}/api/books/edit/${id}`, updateBookData, {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      });
-      Swal.fire({
-        title: "Book Updated",
-        text: "Your book has been updated successfully!",
-        icon: "success",
-      });
-      refetch();
+        const formData = new FormData();
+
+        // Append other form fields
+        Object.keys(data).forEach((key) => {
+            if (data[key] !== null) {
+                formData.append(key, data[key]);
+            }
+        });
+
+        // Append selected file
+        if (selectedFile) {
+            formData.append('coverImage', selectedFile);
+        }
+
+        const response = await axios.put(`${getBaseUrl()}/api/books/edit/${id}`, formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+                Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+        });
+
+        Swal.fire({
+            title: "Book Updated",
+            text: "Your book has been updated successfully!",
+            icon: "success",
+        });
+        refetch();
     } catch (error) {
-      Swal.fire({
-        title: "Error",
-        text: "Failed to update the book.",
-        icon: "error",
-      });
+        Swal.fire({
+            title: "Error",
+            text: "Failed to update the book.",
+            icon: "error",
+        });
     }
-  };
+};
 
   if (isLoading) {
     return (
@@ -267,7 +295,7 @@ const UpdateBook = () => {
           />
         )}
 
-        {/* Cover Image */}
+
         <Controller
           name="coverImage"
           control={control}
@@ -277,11 +305,26 @@ const UpdateBook = () => {
               label="Cover Image URL"
               fullWidth
               margin="normal"
+              disabled={!!selectedFile}
               error={!!error}
               helperText={error?.message}
             />
           )}
         />
+
+        {/* File Input for Image */}
+        <input
+          type="file"
+          accept="image/*"
+          onChange={(e) => setSelectedFile(e.target.files[0])}
+          className="mb-3"
+        />
+
+        {uploading && (
+          <Box display="flex" justifyContent="center" mb={2}>
+            <CircularProgress />
+          </Box>
+        )}
 
         <Button type="submit" variant="contained" color="primary" fullWidth>
           Update Book
