@@ -2,7 +2,6 @@ import React from 'react'
 import { FiShoppingCart } from "react-icons/fi"
 import { useParams } from "react-router-dom"
 import { useFetchBookByIdQuery } from '../../redux/features/books/BooksApi'
-import { getImgUrl } from '../../utils/getImgUrl'
 import { useDispatch } from 'react-redux'
 import { addToCart } from '../../redux/features/cart/cartSlice'
 import Recommened from '../home/Recommened'

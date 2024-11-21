@@ -18,6 +18,7 @@ import AddBook from "../pages/dashboard/Books/AddBook";
 import UpdateBook from "../pages/dashboard/Books/UpdateBook";
 import RegisterCourier from "../pages/courier/RegisterCourier";
 import CourierRoute from "./CourierRoute";
+import Store from "../pages/store/Store";
 
 const router = createBrowserRouter([
     {
@@ -27,6 +28,10 @@ const router = createBrowserRouter([
         {
             path: "/",
             element: <Home/>,
+        },
+        {
+          path: "/store",
+          element: <Store/>,
         },
         {
             path: "/orders",
