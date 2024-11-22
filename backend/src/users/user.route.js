@@ -6,7 +6,7 @@ const {
     getSingleUser,
     updateUser,
     deleteUser,
-    createUser,
+    adminCreateUser,
 } = require('./user.controller');
 const verifyAdminToken = require('../middleware/verifyAdminToken');
 const router = express.Router();
@@ -18,7 +18,7 @@ router.post("/admin", loginAdmin);
 // Admin-protected routes
 router.get("/", getAllUsers);
 router.get("/:id", verifyAdminToken, getSingleUser);
-// router.post('/create-user',verifyAdminToken, createUser);
+router.post("/create-user", verifyAdminToken, adminCreateUser);
 router.put("/update/:id", verifyAdminToken, updateUser);
 router.delete("/:id", verifyAdminToken, deleteUser);
 

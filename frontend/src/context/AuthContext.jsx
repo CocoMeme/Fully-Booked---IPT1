@@ -28,16 +28,15 @@ export const AuthProvider = ({ children }) => {
   const fetchUser = async (firebaseUser) => {
     if (!firebaseUser) {
       setCurrentUser(null);
+      setLoading(false);
       return;
     }
 
     setLoading(true);
     try {
-      // Fetch a custom backend token from Firebase
       const idToken = await firebaseUser.getIdToken();
       setToken(idToken);
 
-      // Fetch additional user details from your backend
       const response = await axios.get(`${getBaseUrl()}/api/current-user`, {
         headers: { Authorization: `Bearer ${idToken}` },
       });
@@ -55,16 +54,16 @@ export const AuthProvider = ({ children }) => {
   };
 
   // Register User
-  const registerUser = async (username, email, password) => {
+  const registerUser = async (username, email, password, role) => {
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const firebaseUser = userCredential.user;
 
-      // Save user in your backend
       await axios.post(`${getBaseUrl()}/api/auth/register`, {
         username,
         email,
         password,
+        role,
         firebaseUid: firebaseUser.uid,
       });
 
@@ -132,5 +131,10 @@ export const AuthProvider = ({ children }) => {
     logout,
   };
 
-  return <AuthContext.Provider value={value}>{!loading && children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider value={value}>
+      {/* Ensure that children are rendered only when loading is false */}
+      {!loading && children}
+    </AuthContext.Provider>
+  );
 };

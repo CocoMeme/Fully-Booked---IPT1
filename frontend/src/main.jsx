@@ -16,12 +16,15 @@ import { ToastContainer } from 'react-toastify';
 // Material-UI Theme
 import { ThemeProvider, CssBaseline } from '@mui/material';
 import theme from './utils/theme.js'; 
+import { AuthProvider } from './context/AuthContext.jsx';
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <Provider store={store}>
       <ThemeProvider theme={theme}>
         <CssBaseline />
-        <RouterProvider router={router} />
+        <AuthProvider>
+          <RouterProvider router={router} />
+        </AuthProvider>
         <ToastContainer />
       </ThemeProvider>
     </Provider>

@@ -90,7 +90,7 @@ const ManageUsers = () => {
                             Manage Users
                         </Link>
                         <Link
-                            to="/dashboard/add-user"
+                            to="/dashboard/add-new-user"
                             className="inline-flex px-5 py-3 text-white bg-gray-600 hover:bg-gray-700 focus:bg-gray-700 rounded-md ml-6 mb-3"
                         >
                             Add New User

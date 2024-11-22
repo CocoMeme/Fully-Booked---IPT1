@@ -25,7 +25,7 @@ const usersApi = createApi({
             query: (id) => `/${id}`,
             providesTags: (results, error, id) => [{ type: "Users", id }]
         }),
-        addUser: builder.mutation({
+        adminCreateUser: builder.mutation({
             query: (newUser) => ({
                 url: `/create-user`,
                 method: "POST",
@@ -57,7 +57,7 @@ const usersApi = createApi({
 export const {
     useFetchAllUsersQuery,
     useFetchUserByIdQuery,
-    useAddUserMutation,
+    useAdminCreateUserMutation,
     useUpdateUserMutation,
     useDeleteUserMutation
 } = usersApi

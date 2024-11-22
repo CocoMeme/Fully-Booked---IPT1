@@ -64,6 +64,133 @@ exports.loginAdmin = async (req, res) => {
     }
 };
 
+exports.getAllUsers = async (req, res) => {
+    try {
+        const users = await User.find().sort({ createdAt: -1 });
+        res.status(200).send(users);
+    } catch (error) {
+        console.error("Error: Fetching Users", error);
+        res.status(500).send({ message: "Failed to fetch users!" });
+    }
+};
+
+exports.getSingleUser = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const user = await User.findById(id);
+        if (!user) {
+            return res.status(404).send({ message: "User not found!" });
+        }
+        res.status(200).send(user);
+    } catch (error) {
+        console.error("Error: Fetching a User", error);
+        res.status(500).send({ message: "Failed to fetch the user!" });
+    }
+};
+
+exports.adminCreateUser = async (req, res, next) => {
+    const { username, email, password, firebaseUid, role } = req.body;
+
+    try {
+        // Check if required fields are provided
+        if (!username || !email || !password || !firebaseUid) {
+            return res.status(400).json({ message: "All fields (username, email, password, firebaseUid) are required." });
+        }
+
+        // Check if the role is valid
+        const validRoles = ["admin", "user"];
+        if (role && !validRoles.includes(role)) {
+            return res.status(400).json({ message: "Invalid role provided. Valid roles are: admin, user." });
+        }
+
+        // Check if a user with the same email or username already exists
+        const existingUser = await User.findOne({ $or: [{ email }, { username }] });
+        if (existingUser) {
+            return res.status(409).json({ message: "A user with this email or username already exists." });
+        }
+
+        // Hash the password
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        // Create a new user
+        const newUser = new User({
+            username,
+            email,
+            password: hashedPassword,
+            firebaseUid,
+            role: role || "customer", // Default to "user" if no role is provided
+        });
+        await newUser.save();
+
+        // Generate a token
+        const token = jwt.sign(
+            { id: newUser._id, email: newUser.email, role: newUser.role, firebaseUid: newUser.firebaseUid },
+            JWT_SECRET,
+            { expiresIn: "1h" }
+        );
+
+        res.status(201).json({
+            message: "User created successfully!",
+            user: {
+                id: newUser._id,
+                username: newUser.username,
+                email: newUser.email,
+                role: newUser.role,
+            },
+            token,
+        });
+    } catch (error) {
+        console.error("Error in adminCreateUser:", error);
+        next(error);
+    }
+};
+
+  
+
+exports.updateUser = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        const existingUser = await User.findById(id);
+        if (!existingUser) {
+            return res.status(404).send({ message: "User not found!" });
+        }
+
+        const updatedData = { ...req.body }; 
+        if (req.file && req.file.path) {
+            updatedData.avatar = req.file.path; // Handle avatar upload if provided
+        }
+
+        const updatedUser = await User.findByIdAndUpdate(id, updatedData, { new: true });
+        res.status(200).send({
+            message: "User updated successfully",
+            user: updatedUser,
+        });
+    } catch (error) {
+        console.error("Error: Updating a User", error);
+        res.status(500).send({ message: "Failed to update the user!" });
+    }
+};
+
+exports.deleteUser = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const deletedUser = await User.findByIdAndDelete(id);
+        if (!deletedUser) {
+            return res.status(404).send({ message: "User not found!" });
+        }
+        res.status(200).send({
+            message: "User deleted successfully",
+            user: deletedUser,
+        });
+    } catch (error) {
+        console.error("Error: Deleting a User", error);
+        res.status(500).send({ message: "Failed to delete the user!" });
+    }
+};
+
+// COURIER FUNCTIONALITIES
+
 exports.submitCourierApplication = async (req, res) => {
     try {
         const { userId } = req.params;  // Assuming the user ID is sent as a URL parameter
@@ -143,72 +270,5 @@ exports.processCourierApplication = async (req, res) => {
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'An error occurred while processing the application' });
-    }
-};
-
-exports.getAllUsers = async (req, res) => {
-    try {
-        const users = await User.find().sort({ createdAt: -1 });
-        res.status(200).send(users);
-    } catch (error) {
-        console.error("Error: Fetching Users", error);
-        res.status(500).send({ message: "Failed to fetch users!" });
-    }
-};
-
-
-exports.getSingleUser = async (req, res) => {
-    try {
-        const { id } = req.params;
-        const user = await User.findById(id);
-        if (!user) {
-            return res.status(404).send({ message: "User not found!" });
-        }
-        res.status(200).send(user);
-    } catch (error) {
-        console.error("Error: Fetching a User", error);
-        res.status(500).send({ message: "Failed to fetch the user!" });
-    }
-};
-
-exports.updateUser = async (req, res) => {
-    try {
-        const { id } = req.params;
-
-        const existingUser = await User.findById(id);
-        if (!existingUser) {
-            return res.status(404).send({ message: "User not found!" });
-        }
-
-        const updatedData = { ...req.body }; 
-        if (req.file && req.file.path) {
-            updatedData.avatar = req.file.path; // Handle avatar upload if provided
-        }
-
-        const updatedUser = await User.findByIdAndUpdate(id, updatedData, { new: true });
-        res.status(200).send({
-            message: "User updated successfully",
-            user: updatedUser,
-        });
-    } catch (error) {
-        console.error("Error: Updating a User", error);
-        res.status(500).send({ message: "Failed to update the user!" });
-    }
-};
-
-exports.deleteUser = async (req, res) => {
-    try {
-        const { id } = req.params;
-        const deletedUser = await User.findByIdAndDelete(id);
-        if (!deletedUser) {
-            return res.status(404).send({ message: "User not found!" });
-        }
-        res.status(200).send({
-            message: "User deleted successfully",
-            user: deletedUser,
-        });
-    } catch (error) {
-        console.error("Error: Deleting a User", error);
-        res.status(500).send({ message: "Failed to delete the user!" });
     }
 };
