@@ -1,30 +1,43 @@
 const express = require('express');
-const { postBook, getAllBooks, getSingleBook, updateBook, deleteBook } = require('./book.controller');
+const { 
+    postBook, 
+    getAllBooks, 
+    getSingleBook, 
+    updateBook, 
+    deleteBook 
+} = require('./book.controller');
 const verifyAdminToken = require('../middleware/verifyAdminToken');
-const upload = require('../../utils/multer.config');
+const { uploadMultiple } = require('../../utils/multer.config');
 const router = express.Router();
 
-router.post("/create-book", verifyAdminToken, upload.single('coverImage'), postBook);
+// Route to create a new book with multiple images
+router.post("/create-book", verifyAdminToken, uploadMultiple, postBook);
+
+// Route to get all books
 router.get("/", getAllBooks);
+
+// Route to get a single book by its ID
 router.get("/:id", getSingleBook);
-router.put('/edit/:id', upload.single('coverImage'), verifyAdminToken, updateBook);
+
+// Route to update a book with new data and multiple images
+router.put("/edit/:id", uploadMultiple, verifyAdminToken, updateBook);
+
+// Route to delete a book by its ID
 router.delete("/:id", verifyAdminToken, deleteBook);
 
-router.post("/upload-cover", upload.single("file"), async (req, res) => {
+// Route to upload images and return their Cloudinary URLs
+router.post("/upload-cover", uploadMultiple, async (req, res) => {
     try {
-      console.log(req.file); // Log the uploaded file
-      if (!req.file) {
-        return res.status(400).json({ message: "No file uploaded!" });
-      }
-  
-      const { path } = req.file; // Cloudinary URL
-      res.status(200).json({ coverImage: path });
+        if (!req.files || req.files.length === 0) {
+            return res.status(400).json({ message: "No file uploaded!" });
+        }
+
+        const imageUrls = req.files.map(file => file.path); // Extract Cloudinary URLs
+        res.status(200).json({ coverImages: imageUrls });
     } catch (error) {
-      console.error("Error uploading cover image:", error);
-      res.status(500).json({ message: "Image upload failed!" });
+        console.error("Error uploading cover image(s):", error);
+        res.status(500).json({ message: "Image upload failed!" });
     }
-  });
-  
-  
+});
 
 module.exports = router;

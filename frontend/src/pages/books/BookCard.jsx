@@ -24,6 +24,12 @@ const BookCard = ({ book }) => {
     }
   };
 
+  // Handle the case when coverImage is an array
+  const coverImageSrc =
+    Array.isArray(book?.coverImage) && book.coverImage.length > 0
+      ? book.coverImage[0] // Take the first image if coverImage is an array
+      : book?.coverImage; // Otherwise, use the single URL
+
   return (
     <div className="rounded-lg transition-shadow duration-300">
       <div className="flex flex-col sm:flex-row sm:items-center sm:h-72 sm:justify-center gap-4">
@@ -40,7 +46,7 @@ const BookCard = ({ book }) => {
           )}
           <Link to={`/books/${book._id}`}>
             <img
-              src={book?.coverImage} // Use the Cloudinary URL directly
+              src={coverImageSrc} // Use the image source (either single URL or first in array)
               alt={book?.title}
               className="w-full bg-cover p-2 rounded-md cursor-pointer hover:scale-105 transition-all duration-200"
             />

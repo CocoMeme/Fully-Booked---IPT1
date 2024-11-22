@@ -26,46 +26,60 @@ const AddBook = () => {
     },
   });
 
-  const [imageFile, setImageFile] = useState(null);
-  const [imageFileName, setImageFileName] = useState("");
+  const [imageFiles, setImageFiles] = useState([]);
+  const [imagePreviews, setImagePreviews] = useState([]);
   const [addBook, { isLoading }] = useAddBookMutation();
   const tag = watch("tag");
 
   const onSubmit = async (data) => {
-    if (!imageFile) {
+    if (imageFiles.length === 0) {
       Swal.fire({
         title: "Error",
-        text: "Please upload a cover image!",
+        text: "Please upload at least one cover image!",
         icon: "error",
       });
       return;
     }
   
     const formData = new FormData();
-    formData.append("file", imageFile); // Append image file
-    formData.append("upload_preset", "fully-booked"); // Cloudinary preset if required
+    imageFiles.forEach((file) => {
+      formData.append("images", file); // This sends the image files
+    });
   
     try {
-      // Upload the image to the backend/Cloudinary
+      // Step 1: Upload images to Cloudinary
       const uploadResponse = await fetch(`${getBaseUrl()}/api/books/upload-cover`, {
         method: "POST",
         body: formData,
       });
   
       if (!uploadResponse.ok) {
-        throw new Error("Failed to upload the cover image.");
+        throw new Error("Failed to upload the cover images.");
       }
   
-      const { coverImage } = await uploadResponse.json(); // Get Cloudinary URL from the response
+      const { coverImages } = await uploadResponse.json(); // Get Cloudinary URLs
   
-      // Include the coverImage URL in book data
+      if (!coverImages || coverImages.length === 0) {
+        throw new Error("No image URLs returned from upload!");
+      }
+  
+      console.log("Uploaded Image URLs:", coverImages); // Debugging
+  
+      // Step 2: Create new book data including coverImage URLs
       const newBookData = {
         ...data,
-        coverImage, // Cloudinary URL
-        discountPrice: tag === "Sale" ? data.discountPrice : undefined,
+        coverImage: coverImages, // Send the Cloudinary URLs directly
       };
   
-      // Send book details to the backend
+      if (tag === "Sale") {
+        newBookData.discountPrice = data.discountPrice;
+      } else {
+        delete newBookData.discountPrice; // Clean up unnecessary field
+      }
+  
+      console.log("New Book Data to Submit:", newBookData); // Debugging
+  
+      // Step 3: Add book via Redux mutation
       await addBook(newBookData).unwrap();
   
       Swal.fire({
@@ -75,9 +89,10 @@ const AddBook = () => {
       });
   
       reset();
-      setImageFile(null);
-      setImageFileName("");
+      setImageFiles([]);
+      setImagePreviews([]);
     } catch (error) {
+      console.error("Error adding book:", error); // Log error details
       Swal.fire({
         title: "Error",
         text: error.message || "Failed to add the book. Please try again.",
@@ -86,12 +101,15 @@ const AddBook = () => {
     }
   };
   
+  
+
   const handleFileChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setImageFile(file);
-      setImageFileName(file.name);
-    }
+    const files = Array.from(e.target.files);
+    setImageFiles(files);
+
+    // Generate image previews
+    const previews = files.map((file) => URL.createObjectURL(file));
+    setImagePreviews(previews);
   };
 
   return (
@@ -184,7 +202,6 @@ const AddBook = () => {
               <MenuItem value="Business">Business</MenuItem>
               <MenuItem value="Comedy">Comedy</MenuItem>
               <MenuItem value="Fiction">Fiction</MenuItem>
-              <MenuItem value="Horror">Horror</MenuItem>
               <MenuItem value="Adventure">Adventure</MenuItem>
             </Select>
           )}
@@ -240,31 +257,29 @@ const AddBook = () => {
           />
         )}
 
-        {/* Cover Image Upload */}
+        {/* Cover Images Upload */}
         <Box mb={2}>
           <Typography variant="subtitle1" mb={1}>
-            Cover Image
+            Cover Images
           </Typography>
           <input
             type="file"
             accept="image/*"
+            multiple
             onChange={handleFileChange}
             style={{ display: "block", marginBottom: "8px" }}
           />
-          {imageFile && (
-            <img
-              src={URL.createObjectURL(imageFile)}
-              alt="Cover Preview"
-              style={{ width: "100px", height: "auto", marginTop: "8px" }}
-            />
-          )}
-          {imageFileName && (
-            <Typography variant="body2" color="textSecondary">
-              Selected: {imageFileName}
-            </Typography>
-          )}
+          <Box display="flex" flexWrap="wrap" gap={2} mt={2}>
+            {imagePreviews.map((src, index) => (
+              <img
+                key={index}
+                src={src}
+                alt={`Preview ${index}`}
+                style={{ width: "100px", height: "auto" }}
+              />
+            ))}
+          </Box>
         </Box>
-
 
         <Button
           type="submit"

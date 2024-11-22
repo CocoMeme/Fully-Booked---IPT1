@@ -11,6 +11,8 @@ import {
     Paper,
     Button,
     Checkbox,
+    Collapse,
+    Box,
 } from '@mui/material';
 
 const ManageBooks = () => {
@@ -19,16 +21,15 @@ const ManageBooks = () => {
     const { data: books, refetch } = useFetchAllBooksQuery();
     const [deleteBook] = useDeleteBookMutation();
 
-    // State to track selected rows
+    // State to track selected rows and expanded rows
     const [selected, setSelected] = useState([]);
+    const [expanded, setExpanded] = useState({});
 
     // Handle checkbox toggle for a row
     const handleCheckboxToggle = (id) => {
-        if (selected.includes(id)) {
-            setSelected(selected.filter((selectedId) => selectedId !== id));
-        } else {
-            setSelected([...selected, id]);
-        }
+        setSelected((prev) =>
+            prev.includes(id) ? prev.filter((selectedId) => selectedId !== id) : [...prev, id]
+        );
     };
 
     // Handle select all rows
@@ -41,15 +42,14 @@ const ManageBooks = () => {
         }
     };
 
-    // Handle deleting a book
+    // Handle delete
     const handleDeleteBook = async (id) => {
         try {
             await deleteBook(id).unwrap();
             alert('Book deleted successfully!');
             refetch();
-            setSelected(selected.filter((selectedId) => selectedId !== id));
+            setSelected((prev) => prev.filter((selectedId) => selectedId !== id));
         } catch (error) {
-            console.error('Failed to delete book:', error.message);
             alert('Failed to delete book. Please try again.');
         }
     };
@@ -64,14 +64,16 @@ const ManageBooks = () => {
             refetch();
             setSelected([]);
         } catch (error) {
-            console.error('Failed to delete books:', error.message);
             alert('Failed to delete books. Please try again.');
         }
     };
 
-    // Handle navigating to Edit Book page
-    const handleEditClick = (id) => {
-        navigate(`/dashboard/edit-book/${id}`);
+    // Handle expand/collapse toggle
+    const handleExpandToggle = (id) => {
+        setExpanded((prev) => ({
+            ...prev,
+            [id]: !prev[id],
+        }));
     };
 
     return (
@@ -83,10 +85,16 @@ const ManageBooks = () => {
                         <h2 className="text-gray-600 ml-0.5">Admin Functionality</h2>
                     </div>
                     <div className="flex flex-col md:flex-row items-start justify-end -mb-3">
-                        <Link to="/dashboard/manage-books" className="inline-flex px-5 py-3 text-gray-600 hover:text-gray-700 focus:text-gray-700 hover:bg-gray-100 focus:bg-gray-100 border border-gray-600 rounded-md mb-3">
+                        <Link
+                            to="/dashboard/manage-books"
+                            className="inline-flex px-5 py-3 text-gray-600 hover:text-gray-700 focus:text-gray-700 hover:bg-gray-100 focus:bg-gray-100 border border-gray-600 rounded-md mb-3"
+                        >
                             Manage Books
                         </Link>
-                        <Link to="/dashboard/add-new-book" className="inline-flex px-5 py-3 text-white bg-gray-600 hover:bg-gray-700 focus:bg-gray-700 rounded-md ml-6 mb-3">
+                        <Link
+                            to="/dashboard/add-new-book"
+                            className="inline-flex px-5 py-3 text-white bg-gray-600 hover:bg-gray-700 focus:bg-gray-700 rounded-md ml-6 mb-3"
+                        >
                             Add New Book
                         </Link>
                         {selected.length > 0 && (
@@ -94,7 +102,7 @@ const ManageBooks = () => {
                                 variant="contained"
                                 color="error"
                                 onClick={handleBulkDelete}
-                                sx={{ ml: 2, p: 1.5, pl: 2}}
+                                sx={{ ml: 2, p: 1.5, pl: 2 }}
                             >
                                 Delete Selected ({selected.length})
                             </Button>
@@ -126,39 +134,83 @@ const ManageBooks = () => {
                                 </TableRow>
                             </TableHead>
                             <TableBody>
-                                {books && books.map((book, index) => (
-                                    <TableRow key={book._id} selected={selected.includes(book._id)}>
-                                        <TableCell padding="checkbox">
-                                            <Checkbox
-                                                checked={selected.includes(book._id)}
-                                                onChange={() => handleCheckboxToggle(book._id)}
-                                            />
-                                        </TableCell>
-                                        <TableCell>{index + 1}</TableCell>
-                                        <TableCell>{book.title}</TableCell>
-                                        <TableCell>{book.category}</TableCell>
-                                        <TableCell>{book.tag}</TableCell>
-                                        <TableCell>₱{book.price}</TableCell>
-                                        <TableCell>₱{book.discountPrice || "0"}</TableCell>
-                                        <TableCell>
-                                            <Button
-                                                variant="contained"
-                                                color="primary"
-                                                onClick={() => handleEditClick(book._id)}
-                                                sx={{ mr: 1 }}
+                                {books &&
+                                    books.map((book, index) => (
+                                        <React.Fragment key={book._id}>
+                                            <TableRow
+                                                selected={selected.includes(book._id)}
+                                                onClick={() => handleExpandToggle(book._id)}
+                                                style={{ cursor: 'pointer' }}
                                             >
-                                                Edit
-                                            </Button>
-                                            <Button
-                                                variant="contained"
-                                                color="error"
-                                                onClick={() => handleDeleteBook(book._id)}
-                                            >
-                                                Delete
-                                            </Button>
-                                        </TableCell>
-                                    </TableRow>
-                                ))}
+                                                <TableCell padding="checkbox" onClick={(e) => e.stopPropagation()}>
+                                                    <Checkbox
+                                                        checked={selected.includes(book._id)}
+                                                        onChange={() => handleCheckboxToggle(book._id)}
+                                                    />
+                                                </TableCell>
+                                                <TableCell>{index + 1}</TableCell>
+                                                <TableCell>{book.title}</TableCell>
+                                                <TableCell>{book.category}</TableCell>
+                                                <TableCell>{book.tag}</TableCell>
+                                                <TableCell>₱{book.price}</TableCell>
+                                                <TableCell>₱{book.discountPrice || '0'}</TableCell>
+                                                <TableCell onClick={(e) => e.stopPropagation()}>
+                                                    <Button
+                                                        variant="contained"
+                                                        color="primary"
+                                                        onClick={() => navigate(`/dashboard/edit-book/${book._id}`)}
+                                                        sx={{ mr: 1 }}
+                                                    >
+                                                        Edit
+                                                    </Button>
+                                                    <Button
+                                                        variant="contained"
+                                                        color="error"
+                                                        onClick={() => handleDeleteBook(book._id)}
+                                                    >
+                                                        Delete
+                                                    </Button>
+                                                </TableCell>
+                                            </TableRow>
+                                            <TableRow>
+                                                <TableCell colSpan={8} style={{ paddingBottom: 0, paddingTop: 0 }}>
+                                                    <Collapse in={expanded[book._id]} timeout="auto" unmountOnExit>
+                                                        <Box margin={2}>
+                                                            {/* Cover Image(s) */}
+                                                            <div>
+                                                                <strong>Cover Image:</strong>
+                                                                {Array.isArray(book.coverImage) ? (
+                                                                    <Box display="flex" gap={2}>
+                                                                        {book.coverImage.map((url, index) => (
+                                                                            <img
+                                                                                key={index}
+                                                                                src={url}
+                                                                                alt={`Cover ${index + 1}`}
+                                                                                style={{ width: '100px', height: 'auto', objectFit: 'cover' }}
+                                                                            />
+                                                                        ))}
+                                                                    </Box>
+                                                                ) : (
+                                                                    <img
+                                                                        src={book.coverImage}
+                                                                        alt={book.title}
+                                                                        style={{ width: '100px', height: 'auto', objectFit: 'cover' }}
+                                                                    />
+                                                                )}
+                                                            </div>
+
+                                                            {/* Description */}
+                                                            <div>
+                                                                <strong>Description:</strong>
+                                                                <p>{book.description}</p>
+                                                            </div>
+                                                        </Box>
+                                                    </Collapse>
+                                                </TableCell>
+                                            </TableRow>
+
+                                        </React.Fragment>
+                                    ))}
                             </TableBody>
                         </Table>
                     </TableContainer>

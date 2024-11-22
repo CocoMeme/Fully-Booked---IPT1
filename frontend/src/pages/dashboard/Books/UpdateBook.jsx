@@ -6,7 +6,10 @@ import * as yup from "yup";
 import Swal from "sweetalert2";
 import axios from "axios";
 import getBaseUrl from "../../../utils/baseURL";
-import { useFetchBookByIdQuery, useUpdateBookMutation } from "../../../redux/features/books/booksApi";
+import {
+  useFetchBookByIdQuery,
+  useUpdateBookMutation,
+} from "../../../redux/features/books/booksApi";
 import {
   Box,
   Button,
@@ -19,7 +22,10 @@ import {
 
 // Validation schema using Yup
 const validationSchema = yup.object().shape({
-  title: yup.string().required("Title is required").min(3, "Title must be at least 3 characters"),
+  title: yup
+    .string()
+    .required("Title is required")
+    .min(3, "Title must be at least 3 characters"),
   description: yup.string().required("Description is required"),
   category: yup.string().required("Category is required"),
   tag: yup.string().required("Tag is required"),
@@ -32,16 +38,19 @@ const validationSchema = yup.object().shape({
     .nullable()
     .when("tag", (tag, schema) =>
       tag === "Sale"
-        ? schema.required("Discount price is required when tag is 'Sale'").positive("Discount price must be greater than 0")
+        ? schema
+          .required("Discount price is required when tag is 'Sale'")
+          .positive("Discount price must be greater than 0")
         : schema.nullable()
     ),
 });
 
-
 const UpdateBook = () => {
   const { id } = useParams();
-  const { data: bookData, isLoading, isError, refetch } = useFetchBookByIdQuery(id);
-  const [selectedFile, setSelectedFile] = useState(null);
+  const { data: bookData, isLoading, isError, refetch } =
+    useFetchBookByIdQuery(id);
+  const [selectedFiles, setSelectedFiles] = useState([]);
+  const [uploadedImageUrls, setUploadedImageUrls] = useState([]);
   const [uploading, setUploading] = useState(false);
 
   const { control, handleSubmit, setValue, reset, watch } = useForm({
@@ -53,7 +62,7 @@ const UpdateBook = () => {
       tag: "",
       price: "",
       discountPrice: "",
-      coverImage: "",
+      coverImage: [],
     },
   });
 
@@ -68,69 +77,74 @@ const UpdateBook = () => {
         tag: bookData.tag,
         price: bookData.price,
         discountPrice: bookData.discountPrice,
-        coverImage: bookData.coverImage,
+        coverImage: bookData.coverImage || [],
       });
+      setUploadedImageUrls(bookData.coverImage || []);
     }
   }, [bookData, reset]);
 
-  // const uploadImageToCloudinary = async (file) => {
-  //   const formData = new FormData();
-  //   formData.append("file", file);
-  //   formData.append("upload_preset", "book_upload"); // Replace with your Cloudinary upload preset
+  const uploadImages = async (files) => {
+    const formData = new FormData();
+    files.forEach((file) => formData.append("file", file));
+    formData.append("upload_preset", "your_upload_preset"); // Replace with your Cloudinary preset
 
-  //   try {
-  //     setUploading(true);
-  //     const response = await axios.post("https://api.cloudinary.com/v1_1/your_cloud_name/image/upload", formData);
-  //     setUploading(false);
-  //     return response.data.secure_url; // Return the secure URL
-  //   } catch (error) {
-  //     setUploading(false);
-  //     Swal.fire({
-  //       title: "Error",
-  //       text: "Failed to upload image to Cloudinary.",
-  //       icon: "error",
-  //     });
-  //     throw error;
-  //   }
-  // };
+    try {
+      const responses = await Promise.all(
+        files.map(async (file) => {
+          const response = await axios.post(
+            "https://api.cloudinary.com/v1_1/your_cloud_name/image/upload", // Replace with your Cloudinary URL
+            formData
+          );
+          return response.data.secure_url; // Get the uploaded image URL
+        })
+      );
+      return responses;
+    } catch (error) {
+      console.error("Error uploading images:", error);
+      return [];
+    }
+  };
 
   const onSubmit = async (data) => {
     try {
-        const formData = new FormData();
+      setUploading(true);
 
-        // Append other form fields
-        Object.keys(data).forEach((key) => {
-            if (data[key] !== null) {
-                formData.append(key, data[key]);
-            }
-        });
+      // Upload any newly selected files
+      const newImageUrls = await uploadImages(selectedFiles);
 
-        // Append selected file
-        if (selectedFile) {
-            formData.append('coverImage', selectedFile);
-        }
+      // Combine existing and new image URLs
+      const updatedCoverImages = [...uploadedImageUrls, ...newImageUrls];
 
-        const response = await axios.put(`${getBaseUrl()}/api/books/edit/${id}`, formData, {
-            headers: {
-                'Content-Type': 'multipart/form-data',
-                Authorization: `Bearer ${localStorage.getItem("token")}`,
-            },
-        });
+      // Prepare data for submission
+      const updatedData = {
+        ...data,
+        coverImage: updatedCoverImages,
+      };
 
-        Swal.fire({
-            title: "Book Updated",
-            text: "Your book has been updated successfully!",
-            icon: "success",
-        });
-        refetch();
+      await axios.put(`${getBaseUrl()}/api/books/edit/${id}`, updatedData, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
+
+      Swal.fire({
+        title: "Book Updated",
+        text: "Your book has been updated successfully!",
+        icon: "success",
+      });
+
+      refetch();
+      setUploading(false);
     } catch (error) {
-        Swal.fire({
-            title: "Error",
-            text: "Failed to update the book.",
-            icon: "error",
-        });
+      console.error("Error updating book:", error);
+      Swal.fire({
+        title: "Error",
+        text: "Failed to update the book.",
+        icon: "error",
+      });
+      setUploading(false);
     }
-};
+  };
 
   if (isLoading) {
     return (
@@ -152,6 +166,7 @@ const UpdateBook = () => {
 
   return (
     <section>
+
       <main className="mb-7 w-full xl:w-10/12 xl:mb-7 px-4 mx-auto">
         <div className="flex flex-col space-y-6 md:space-y-0 md:flex-row justify-between">
           <div className="mr-6">
@@ -159,10 +174,16 @@ const UpdateBook = () => {
             <h2 className="text-gray-600 ml-0.5">Admin Functionality</h2>
           </div>
           <div className="flex flex-col md:flex-row items-start justify-end -mb-3">
-            <Link to="/dashboard/manage-books" className="inline-flex px-5 py-3 text-gray-600 hover:text-gray-700 focus:text-gray-700 hover:bg-gray-100 focus:bg-gray-100 border border-gray-600 rounded-md mb-3">
+            <Link
+              to="/dashboard/manage-books"
+              className="inline-flex px-5 py-3 text-gray-600 hover:text-gray-700 focus:text-gray-700 hover:bg-gray-100 focus:bg-gray-100 border border-gray-600 rounded-md mb-3"
+            >
               Manage Books
             </Link>
-            <Link to="/dashboard/add-new-book" className="inline-flex px-5 py-3 text-white bg-gray-600 hover:bg-gray-700 focus:bg-gray-700 rounded-md ml-6 mb-3">
+            <Link
+              to="/dashboard/add-new-book"
+              className="inline-flex px-5 py-3 text-white bg-gray-600 hover:bg-gray-700 focus:bg-gray-700 rounded-md ml-6 mb-3"
+            >
               Add New Book
             </Link>
           </div>
@@ -295,39 +316,43 @@ const UpdateBook = () => {
           />
         )}
 
-
-        <Controller
-          name="coverImage"
-          control={control}
-          render={({ field, fieldState: { error } }) => (
-            <TextField
-              {...field}
-              label="Cover Image URL"
-              fullWidth
-              margin="normal"
-              disabled={!!selectedFile}
-              error={!!error}
-              helperText={error?.message}
-            />
-          )}
-        />
-
-        {/* File Input for Image */}
+        {/* File Upload */}
         <input
           type="file"
           accept="image/*"
-          onChange={(e) => setSelectedFile(e.target.files[0])}
+          multiple
+          onChange={(e) => setSelectedFiles([...e.target.files])}
           className="mb-3"
         />
 
-        {uploading && (
-          <Box display="flex" justifyContent="center" mb={2}>
-            <CircularProgress />
-          </Box>
-        )}
+        {/* Preview */}
+        <Box display="flex" flexWrap="wrap" gap={2} mb={2}>
+          {uploadedImageUrls.map((url, index) => (
+            <img
+              key={index}
+              src={url}
+              alt={`Uploaded ${index + 1}`}
+              style={{ width: 100, height: 100, objectFit: "cover", borderRadius: 4 }}
+            />
+          ))}
+          {selectedFiles.map((file, index) => (
+            <img
+              key={index}
+              src={URL.createObjectURL(file)}
+              alt={`Preview ${index + 1}`}
+              style={{ width: 100, height: 100, objectFit: "cover", borderRadius: 4 }}
+            />
+          ))}
+        </Box>
 
-        <Button type="submit" variant="contained" color="primary" fullWidth>
-          Update Book
+        <Button
+          variant="contained"
+          color="primary"
+          fullWidth
+          type="submit"
+          disabled={uploading}
+        >
+          {uploading ? "Uploading..." : "Update Book"}
         </Button>
       </Box>
     </section>

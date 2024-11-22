@@ -41,7 +41,7 @@ const SingleBook = () => {
                 <Grid item xs={12} md={4}>
                     <Box
                         component="img"
-                        src={book?.coverImage || '/placeholder-image.jpg'}
+                        src={(Array.isArray(book?.coverImage) && book.coverImage.length > 0) ? book.coverImage[0] : '/placeholder-image.jpg'}
                         alt={book?.title || 'Book cover'}
                         sx={{
                             width: '100%',
@@ -52,6 +52,7 @@ const SingleBook = () => {
                         }}
                     />
                 </Grid>
+
 
                 {/* Book Details */}
                 <Grid item xs={12} md={8}>
@@ -94,18 +95,7 @@ const SingleBook = () => {
                                 color="primary"
                                 sx={{ marginBottom: 2 }}
                             />
-                            <Box display="flex" alignItems="center" sx={{ marginBottom: 2 }}>
-                                <Rating
-                                    name="read-only"
-                                    value={book?.rating || 0}
-                                    precision={0.1}
-                                    readOnly
-                                    size="medium"
-                                />
-                                <Typography variant="body2" sx={{ marginLeft: 1 }}>
-                                    {book?.rating ? book.rating.toFixed(1) : 'No Ratings'}
-                                </Typography>
-                            </Box>
+ 
                             <Typography variant="body1" sx={{ marginBottom: 2 }}>
                                 {book?.description || 'No description available.'}
                             </Typography>

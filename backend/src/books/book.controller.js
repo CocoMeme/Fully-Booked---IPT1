@@ -3,26 +3,75 @@ const cloudinary = require('../../utils/cloudinary.config')
 
 const postBook = async (req, res) => {
     try {
-
-      const { coverImage, ...bookData } = req.body;
+      const { body } = req;
   
-      if (!coverImage) {
-        return res.status(400).send({ message: "Cover image URL is required!" });
+      // Ensure that the frontend sends coverImages as an array of URLs
+      if (!body.coverImage || body.coverImage.length === 0) {
+        return res.status(400).send({ message: "At least one image is required!" });
       }
   
+      // The coverImages are already passed as Cloudinary URLs from the frontend
+      const coverImages = body.coverImage; // No need to use files here
+  
       const newBook = new Book({
-        ...bookData,
-        coverImage,
+        ...body,
+        coverImage: coverImages, // Save the array of Cloudinary URLs
       });
   
       await newBook.save();
       res.status(200).send({ message: "Book posted successfully!", book: newBook });
-  
     } catch (error) {
       console.error("Error: Creating Book", error);
       res.status(500).send({ message: "Book post failed!" });
     }
   };
+  
+  
+  const updateBook = async (req, res) => {
+    try {
+      const { id } = req.params;
+  
+      // Find the existing book
+      const existingBook = await Book.findById(id);
+      if (!existingBook) {
+        return res.status(404).send({ message: "Book not found!" });
+      }
+  
+      const { files, body } = req;
+  
+      // Upload new images to Cloudinary (or your preferred storage service) if there are any
+      let updatedImages = existingBook.coverImage; // Start with existing images
+      if (files && files.length > 0) {
+        const uploadedImageUrls = await Promise.all(
+          files.map(async (file) => {
+            // Assuming a Cloudinary upload function
+            const uploadResult = await uploadToCloudinary(file.path); // Replace with your upload logic
+            return uploadResult.secure_url; // Use the URL from the upload response
+          })
+        );
+  
+        updatedImages = uploadedImageUrls; // Replace old images with the new URLs
+      }
+  
+      // Prepare updated data
+      const updatedData = {
+        ...body,
+        coverImage: updatedImages,
+      };
+  
+      // Update the book in the database
+      const updatedBook = await Book.findByIdAndUpdate(id, updatedData, { new: true });
+  
+      res.status(200).send({
+        message: "Book updated successfully",
+        book: updatedBook,
+      });
+    } catch (error) {
+      console.error("Error: Updating a Book", error);
+      res.status(500).send({ message: "Failed to update the book!" });
+    }
+  };
+  
   
 const getAllBooks = async (req, res) => {
     try {
@@ -48,31 +97,6 @@ const getSingleBook = async (req, res) => {
     }
 }
 
-const updateBook = async (req, res) => {
-    try {
-        const { id } = req.params;
-
-        const existingBook = await Book.findById(id);
-        if (!existingBook) {
-            return res.status(404).send({ message: "Book not found!" });
-        }
-
-        let updatedData = { ...req.body }; 
-        if (req.file && req.file.path) {
-            updatedData.coverImage = req.file.path;
-        }
-
-        const updatedBook = await Book.findByIdAndUpdate(id, updatedData, { new: true });
-        
-        res.status(200).send({
-            message: "Book updated successfully",
-            book: updatedBook,
-        });
-    } catch (error) {
-        console.error("Error: Updating a Book", error);
-        res.status(500).send({ message: "Failed to update the book!" });
-    }
-};
 
 
 const deleteBook = async (req, res) => {
