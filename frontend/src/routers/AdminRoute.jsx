@@ -9,15 +9,4 @@ const AdminRoute = ({children}) => {
     return children ? children : <Outlet/>
 }
 
-// const AdminRoute = ({ children }) => {
-//     const token = localStorage.getItem('token');
-
-//     // Decode or validate token
-//     if (!token || !isValidAdminToken(token)) {
-//         return <Navigate to="/admin" />;
-//     }
-
-//     return children || <Outlet />;
-// };
-
 export default AdminRoute

@@ -2,21 +2,20 @@ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import getBaseUrl from '../../../utils/baseURL';
 
 const baseQuery = fetchBaseQuery({
-    baseUrl: `${getBaseUrl()}/api/users`,
+    baseUrl: `${getBaseUrl()}/api/auth`, // Change this to match the backend route
     credentials: 'include',
-    prepareHeaders: (headers) => {
+    prepareHeaders: (Headers) => {
         const token = localStorage.getItem('token');
         if (token) {
-            headers.set('Authorization', `Bearer ${token}`);
+            Headers.set('Authorization', `Bearer ${token}`);
         }
-        return headers;
+        return Headers;
     }
 });
 
 const usersApi = createApi({
-    reducerPath: 'usersApi',
+    reducerPath: 'userApi',
     baseQuery,
-    tagTypes: ['Users'],
     endpoints: (builder) => ({
         fetchAllUsers: builder.query({
             query: () => "/",
@@ -24,23 +23,26 @@ const usersApi = createApi({
         }),        
         fetchUserById: builder.query({
             query: (id) => `/${id}`,
-            providesTags: (result, error, id) => [{ type: "Users", id }]
+            providesTags: (results, error, id) => [{ type: "Users", id }]
         }),
         addUser: builder.mutation({
             query: (newUser) => ({
-                url: "/create",
+                url: `/create-user`,
                 method: "POST",
                 body: newUser
             }),
             invalidatesTags: ["Users"]
         }),
         updateUser: builder.mutation({
-            query: ({ id, ...rest }) => ({
+            query: ( id, ...rest ) => ({
                 url: `/update/${id}`,
                 method: "PUT",
-                body: rest
+                body: rest,
+                headers: {
+                    'Content-Type': 'application/json'
+                }
             }),
-            invalidatesTags: (result, error, { id }) => [{ type: "Users", id }]
+            invalidatesTags: ["Users"]    
         }),
         deleteUser: builder.mutation({
             query: (id) => ({
@@ -58,6 +60,6 @@ export const {
     useAddUserMutation,
     useUpdateUserMutation,
     useDeleteUserMutation
-} = usersApi;
+} = usersApi
 
 export default usersApi;

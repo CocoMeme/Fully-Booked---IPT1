@@ -156,6 +156,7 @@ exports.getAllUsers = async (req, res) => {
     }
 };
 
+
 exports.getSingleUser = async (req, res) => {
     try {
         const { id } = req.params;
