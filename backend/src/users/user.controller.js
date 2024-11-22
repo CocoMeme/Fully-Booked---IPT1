@@ -29,9 +29,6 @@ exports.registerUser = async (req, res, next) => {
     }
 };
 
-
-
-// Admin Login
 exports.loginAdmin = async (req, res) => {
     const { username, password } = req.body;
 
@@ -67,7 +64,6 @@ exports.loginAdmin = async (req, res) => {
     }
 };
 
-// Submit Courier Application
 exports.submitCourierApplication = async (req, res) => {
     try {
         const { userId } = req.params;  // Assuming the user ID is sent as a URL parameter
@@ -105,7 +101,6 @@ exports.submitCourierApplication = async (req, res) => {
     }
 };
 
-// Approve or Reject Courier Application
 exports.processCourierApplication = async (req, res) => {
     try {
         const { userId } = req.params;
@@ -148,5 +143,71 @@ exports.processCourierApplication = async (req, res) => {
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'An error occurred while processing the application' });
+    }
+};
+
+exports.getAllUsers = async (req, res) => {
+    try {
+        const users = await User.find().sort({ createdAt: -1 });
+        res.status(200).send(users);
+    } catch (error) {
+        console.error("Error: Fetching Users", error);
+        res.status(500).send({ message: "Failed to fetch users!" });
+    }
+};
+
+exports.getSingleUser = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const user = await User.findById(id);
+        if (!user) {
+            return res.status(404).send({ message: "User not found!" });
+        }
+        res.status(200).send(user);
+    } catch (error) {
+        console.error("Error: Fetching a User", error);
+        res.status(500).send({ message: "Failed to fetch the user!" });
+    }
+};
+
+exports.updateUser = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        const existingUser = await User.findById(id);
+        if (!existingUser) {
+            return res.status(404).send({ message: "User not found!" });
+        }
+
+        const updatedData = { ...req.body }; 
+        if (req.file && req.file.path) {
+            updatedData.avatar = req.file.path; // Handle avatar upload if provided
+        }
+
+        const updatedUser = await User.findByIdAndUpdate(id, updatedData, { new: true });
+        res.status(200).send({
+            message: "User updated successfully",
+            user: updatedUser,
+        });
+    } catch (error) {
+        console.error("Error: Updating a User", error);
+        res.status(500).send({ message: "Failed to update the user!" });
+    }
+};
+
+exports.deleteUser = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const deletedUser = await User.findByIdAndDelete(id);
+        if (!deletedUser) {
+            return res.status(404).send({ message: "User not found!" });
+        }
+        res.status(200).send({
+            message: "User deleted successfully",
+            user: deletedUser,
+        });
+    } catch (error) {
+        console.error("Error: Deleting a User", error);
+        res.status(500).send({ message: "Failed to delete the user!" });
     }
 };

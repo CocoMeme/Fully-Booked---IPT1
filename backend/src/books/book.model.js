@@ -42,6 +42,8 @@ const bookSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
+  averageRating: { type: Number, default: 0 },
+  reviews: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Review' }],
 }, { timestamps: true });
 
 

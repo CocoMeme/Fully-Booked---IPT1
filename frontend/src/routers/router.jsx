@@ -19,6 +19,9 @@ import UpdateBook from "../pages/dashboard/Books/UpdateBook";
 import RegisterCourier from "../pages/courier/RegisterCourier";
 import CourierRoute from "./CourierRoute";
 import Store from "../pages/store/Store";
+import AddUser from "../pages/dashboard/Users/AddUser";
+import UpdateUser from "../pages/dashboard/Users/UpdateUser";
+import ManageUsers from "../pages/dashboard/Users/ManageUsers";
 
 const router = createBrowserRouter([
     {
@@ -102,7 +105,25 @@ const router = createBrowserRouter([
           element: <AdminRoute>
             <ManageBooks/>
           </AdminRoute>
-        }
+        },
+        {
+          path: "add-new-user",
+          element: <AdminRoute>
+            <AddUser/>
+          </AdminRoute>
+        },
+        {
+          path: "edit-user/:id",
+          element: <AdminRoute>
+            <UpdateUser/>
+          </AdminRoute>
+        },
+        {
+          path: "manage-users",
+          element: <AdminRoute>
+              <ManageUsers />
+          </AdminRoute>
+        }        
       ]
     },
     {

@@ -8,7 +8,6 @@ router.post("/create-book", verifyAdminToken, upload.single('coverImage'), postB
 router.get("/", getAllBooks);
 router.get("/:id", getSingleBook);
 router.put('/edit/:id', upload.single('coverImage'), verifyAdminToken, updateBook);
-// router.put("/edit/:id", verifyAdminToken, updateBook);
 router.delete("/:id", verifyAdminToken, deleteBook);
 
 router.post("/upload-cover", upload.single("file"), async (req, res) => {

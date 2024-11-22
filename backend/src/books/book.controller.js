@@ -3,17 +3,16 @@ const cloudinary = require('../../utils/cloudinary.config')
 
 const postBook = async (req, res) => {
     try {
-      // Ensure coverImage is provided in the request body
+
       const { coverImage, ...bookData } = req.body;
   
       if (!coverImage) {
         return res.status(400).send({ message: "Cover image URL is required!" });
       }
   
-      // Create a new book with the provided coverImage URL
       const newBook = new Book({
         ...bookData,
-        coverImage, // Use the Cloudinary URL from the request body
+        coverImage,
       });
   
       await newBook.save();
@@ -25,8 +24,6 @@ const postBook = async (req, res) => {
     }
   };
   
-
-
 const getAllBooks = async (req, res) => {
     try {
         const books = await Book.find().sort({createdAt: -1})
@@ -55,19 +52,16 @@ const updateBook = async (req, res) => {
     try {
         const { id } = req.params;
 
-        // Check if the book exists
         const existingBook = await Book.findById(id);
         if (!existingBook) {
             return res.status(404).send({ message: "Book not found!" });
         }
 
-        // Handle image upload if a new file is provided
-        let updatedData = { ...req.body }; // Copy all incoming data
+        let updatedData = { ...req.body }; 
         if (req.file && req.file.path) {
-            updatedData.coverImage = req.file.path; // Cloudinary automatically provides the file path as URL
+            updatedData.coverImage = req.file.path;
         }
 
-        // Update book in the database
         const updatedBook = await Book.findByIdAndUpdate(id, updatedData, { new: true });
         
         res.status(200).send({

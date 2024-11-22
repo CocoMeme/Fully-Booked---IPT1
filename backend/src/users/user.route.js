@@ -1,11 +1,23 @@
 const express = require('express');
-const User = require('./user.model');
+const {
+    registerUser,
+    loginAdmin,
+    getAllUsers,
+    getSingleUser,
+    updateUser,
+    deleteUser,
+} = require('./user.controller');
+const verifyAdminToken = require('../middleware/verifyAdminToken');
 const router = express.Router();
 
-const { loginAdmin, registerUser } = require('../users/user.controller.js');
+// Public routes
+router.post("/register", registerUser);
+router.post("/admin", loginAdmin);
 
-
-router.post("/admin", loginAdmin)
-router.post("/register", registerUser)
+// Admin-protected routes
+router.get("/", getAllUsers);
+router.get("/:id", verifyAdminToken, getSingleUser);
+router.put("/update/:id", verifyAdminToken, updateUser);
+router.delete("/:id", verifyAdminToken, deleteUser);
 
 module.exports = router;
