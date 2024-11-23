@@ -43,11 +43,13 @@ const AddBook = () => {
   
     const formData = new FormData();
     imageFiles.forEach((file) => {
-      formData.append("images", file); // This sends the image files
+      formData.append("coverImages", file); // Ensure 'coverImages' matches multer's field name
     });
   
+    console.log([...formData.entries()]); // Debug FormData content
+  
     try {
-      // Step 1: Upload images to Cloudinary
+      // Upload images
       const uploadResponse = await fetch(`${getBaseUrl()}/api/books/upload-cover`, {
         method: "POST",
         body: formData,
@@ -57,29 +59,28 @@ const AddBook = () => {
         throw new Error("Failed to upload the cover images.");
       }
   
-      const { coverImages } = await uploadResponse.json(); // Get Cloudinary URLs
+      const { coverImages } = await uploadResponse.json();
   
       if (!coverImages || coverImages.length === 0) {
         throw new Error("No image URLs returned from upload!");
       }
   
-      console.log("Uploaded Image URLs:", coverImages); // Debugging
+      console.log("Uploaded Image URLs:", coverImages);
   
-      // Step 2: Create new book data including coverImage URLs
+      // Add book data
       const newBookData = {
         ...data,
-        coverImage: coverImages, // Send the Cloudinary URLs directly
+        coverImage: coverImages,
       };
   
       if (tag === "Sale") {
         newBookData.discountPrice = data.discountPrice;
       } else {
-        delete newBookData.discountPrice; // Clean up unnecessary field
+        delete newBookData.discountPrice;
       }
   
-      console.log("New Book Data to Submit:", newBookData); // Debugging
+      console.log("New Book Data to Submit:", newBookData);
   
-      // Step 3: Add book via Redux mutation
       await addBook(newBookData).unwrap();
   
       Swal.fire({
@@ -92,7 +93,7 @@ const AddBook = () => {
       setImageFiles([]);
       setImagePreviews([]);
     } catch (error) {
-      console.error("Error adding book:", error); // Log error details
+      console.error("Error adding book:", error);
       Swal.fire({
         title: "Error",
         text: error.message || "Failed to add the book. Please try again.",
@@ -100,14 +101,12 @@ const AddBook = () => {
       });
     }
   };
-  
-  
+
 
   const handleFileChange = (e) => {
     const files = Array.from(e.target.files);
     setImageFiles(files);
 
-    // Generate image previews
     const previews = files.map((file) => URL.createObjectURL(file));
     setImagePreviews(previews);
   };
@@ -164,6 +163,7 @@ const AddBook = () => {
               margin="normal"
               error={!!error}
               helperText={error?.message}
+              required
             />
           )}
         />
@@ -197,6 +197,7 @@ const AddBook = () => {
               displayEmpty
               margin="normal"
               error={!!error}
+              required
             >
               <MenuItem value="">Choose A Category</MenuItem>
               <MenuItem value="Business">Business</MenuItem>
@@ -220,6 +221,7 @@ const AddBook = () => {
               margin="normal"
               error={!!error}
               helperText={error?.message}
+              required
             />
           )}
         />
@@ -228,9 +230,12 @@ const AddBook = () => {
         <Controller
           name="tag"
           control={control}
+          required
           render={({ field }) => (
             <Select {...field} fullWidth displayEmpty margin="normal">
-              <MenuItem value="">Choose A Tag</MenuItem>
+              <MenuItem value="" disabled>
+                Choose a Tag
+              </MenuItem>
               <MenuItem value="New">New</MenuItem>
               <MenuItem value="Hot">Hot</MenuItem>
               <MenuItem value="Sale">Sale</MenuItem>

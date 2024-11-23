@@ -85,32 +85,35 @@ const UpdateBook = () => {
 
   const uploadImages = async (files) => {
     const formData = new FormData();
-    files.forEach((file) => formData.append("file", file));
-    formData.append("upload_preset", "your_upload_preset"); // Replace with your Cloudinary preset
+    files.forEach((file) => formData.append("coverImage", file)); // Match multer's field name
 
     try {
-      const responses = await Promise.all(
-        files.map(async (file) => {
-          const response = await axios.post(
-            "https://api.cloudinary.com/v1_1/your_cloud_name/image/upload", // Replace with your Cloudinary URL
-            formData
-          );
-          return response.data.secure_url; // Get the uploaded image URL
-        })
+      const response = await axios.post(
+        `${getBaseUrl()}/api/books/upload-cover`, 
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
       );
-      return responses;
+      return response.data; // Assume server responds with array of uploaded URLs
     } catch (error) {
       console.error("Error uploading images:", error);
       return [];
     }
   };
 
+
   const onSubmit = async (data) => {
     try {
       setUploading(true);
 
       // Upload any newly selected files
-      const newImageUrls = await uploadImages(selectedFiles);
+      const newImageUrls = selectedFiles.length
+        ? await uploadImages(selectedFiles)
+        : [];
 
       // Combine existing and new image URLs
       const updatedCoverImages = [...uploadedImageUrls, ...newImageUrls];
@@ -121,6 +124,7 @@ const UpdateBook = () => {
         coverImage: updatedCoverImages,
       };
 
+      // Send updated data to the server
       await axios.put(`${getBaseUrl()}/api/books/edit/${id}`, updatedData, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -145,6 +149,7 @@ const UpdateBook = () => {
       setUploading(false);
     }
   };
+
 
   if (isLoading) {
     return (
@@ -322,8 +327,10 @@ const UpdateBook = () => {
           accept="image/*"
           multiple
           onChange={(e) => setSelectedFiles([...e.target.files])}
+          name="coverImage" // Match multer's field name
           className="mb-3"
         />
+
 
         {/* Preview */}
         <Box display="flex" flexWrap="wrap" gap={2} mb={2}>
