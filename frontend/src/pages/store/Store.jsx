@@ -1,5 +1,17 @@
-import React, { useState } from 'react';
-import { Box, Grid, Typography, Checkbox, FormControlLabel, Switch, Select, MenuItem, FormControl, InputLabel } from '@mui/material';
+import React, { useState, useEffect } from 'react';
+import {
+  Box,
+  Grid,
+  Typography,
+  Checkbox,
+  FormControlLabel,
+  Switch,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
+  CircularProgress,
+} from '@mui/material';
 import { useFetchAllBooksQuery } from '../../redux/features/books/booksApi';
 import BookCard from '../books/BookCard';
 
@@ -11,6 +23,27 @@ const Store = () => {
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [selectedTags, setSelectedTags] = useState([]);
   const [sortPrice, setSortPrice] = useState('');
+  const [displayedBooks, setDisplayedBooks] = useState([]); // Books currently displayed
+  const [itemsToLoad, setItemsToLoad] = useState(9); // Number of items to load at a time
+  const [isLoading, setIsLoading] = useState(false); // Loading indicator state
+
+  // Load books based on the itemsToLoad value
+  useEffect(() => {
+    setDisplayedBooks(
+      books
+        .filter(
+          (book) =>
+            (selectedCategories.length === 0 || selectedCategories.includes(book.category)) &&
+            (selectedTags.length === 0 || selectedTags.some((tag) => (book.tag || []).includes(tag)))
+        )
+        .sort((a, b) => {
+          if (sortPrice === 'low-to-high') return a.price - b.price;
+          if (sortPrice === 'high-to-low') return b.price - a.price;
+          return 0;
+        })
+        .slice(0, itemsToLoad) // Slice the array to show only the required items
+    );
+  }, [books, selectedCategories, selectedTags, sortPrice, itemsToLoad]);
 
   const handleCategoryChange = (category) => {
     setSelectedCategories((prev) =>
@@ -28,18 +61,28 @@ const Store = () => {
     setSortPrice(event.target.value);
   };
 
-  const filteredBooks = books
-  .filter(
-    (book) =>
-      (selectedCategories.length === 0 || selectedCategories.includes(book.category)) &&
-      (selectedTags.length === 0 || selectedTags.some((tag) => (book.tag || []).includes(tag)))
-  )
-  .sort((a, b) => {
-    if (sortPrice === 'low-to-high') return a.price - b.price;
-    if (sortPrice === 'high-to-low') return b.price - a.price;
-    return 0;
-  });
+  // Infinite scroll handler
+  const handleScroll = () => {
+    if (
+      window.innerHeight + document.documentElement.scrollTop >=
+      document.documentElement.offsetHeight - 50
+    ) {
+      if (displayedBooks.length < books.length && !isLoading) {
+        setIsLoading(true);
+        setTimeout(() => {
+          setItemsToLoad((prev) => prev + 9); // Load 9 more items when user scrolls near the bottom
+          setIsLoading(false);
+        }, 1000); // Simulate a network delay
+      }
+    }
+  };
 
+  useEffect(() => {
+    window.addEventListener('scroll', handleScroll);
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, [displayedBooks, books, isLoading]);
 
   return (
     <Box sx={{ display: 'flex', padding: 2 }}>
@@ -99,12 +142,27 @@ const Store = () => {
       {/* Book Cards */}
       <Box sx={{ flexGrow: 1, padding: 2 }}>
         <Grid container spacing={4}>
-          {filteredBooks.map((book) => (
+          {displayedBooks.map((book) => (
             <Grid item xs={3} sm={3} md={3} lg={4} key={book.id}>
               <BookCard book={book} />
             </Grid>
           ))}
         </Grid>
+
+        {isLoading && (
+          <Box sx={{ display: 'flex', justifyContent: 'center', marginTop: 2 }}>
+            <CircularProgress />
+          </Box>
+        )}
+
+        {!isLoading && displayedBooks.length === books.length && (
+          <Typography
+            variant="body2"
+            sx={{ textAlign: 'center', marginTop: 5, color: 'gray' }}
+          >
+            No more books found.
+          </Typography>
+        )}
       </Box>
     </Box>
   );
