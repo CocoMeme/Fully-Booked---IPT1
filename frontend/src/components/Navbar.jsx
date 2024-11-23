@@ -5,6 +5,10 @@ import { useState, useEffect, useRef } from "react";
 import { useSelector } from "react-redux";
 import { useAuth } from "../context/AuthContext";
 
+// Material-UI imports for Alert and Snackbar
+import { Snackbar, Alert } from "@mui/material";
+import CheckCircleIcon from '@mui/icons-material/CheckCircle'; // Add this for the green checkmark icon
+
 const navigation = [
   { name: "Profile", href: "/profile" },
   { name: "Dashboard", href: "/dashboard" },
@@ -15,6 +19,7 @@ const navigation = [
 
 const Navbar = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [openSnackbar, setOpenSnackbar] = useState(false); // State for Snackbar visibility
   const cartItems = useSelector((state) => state.cart.cartItems);
   const { currentUser, logout } = useAuth();
 
@@ -22,7 +27,7 @@ const Navbar = () => {
 
   const handleLogout = () => {
     logout();
-    alert("Logout successfully");
+    setOpenSnackbar(true); // Show Snackbar when user logs out
   };
 
   // Close dropdown when clicking outside
@@ -37,6 +42,11 @@ const Navbar = () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [dropdownRef]);
+
+  // Handle closing Snackbar
+  const handleCloseSnackbar = () => {
+    setOpenSnackbar(false);
+  };
 
   return (
     <header className="px-4 py-6 bg-primary">
@@ -70,7 +80,7 @@ const Navbar = () => {
         {/* Center */}
         <div className="w-2/5 text-white">
           <ul className="flex md:gap-4 text-md text-center font-semibold">
-            <Link to="/store">
+            <Link to="/">
               <li className="nav-item">Store</li>
             </Link>
             <Link to="/apply-courier">
@@ -144,6 +154,30 @@ const Navbar = () => {
           </Link>
         </div>
       </nav>
+
+      {/* Snackbar for logout success */}
+      <Snackbar
+        open={openSnackbar}
+        autoHideDuration={3000}
+        onClose={handleCloseSnackbar}
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+      >
+        <Alert
+          onClose={handleCloseSnackbar}
+          severity="success"
+          sx={{
+            width: '100%',
+            backgroundColor: '#90EE90',
+            color: 'white', 
+            fontSize: '1.1rem', 
+            padding: '16px', 
+            borderRadius: '8px', 
+          }}
+          icon={<CheckCircleIcon sx={{ color: 'white', fontSize: 30 }} />} 
+        >
+          Logout successfully
+        </Alert>
+      </Snackbar>
     </header>
   );
 };

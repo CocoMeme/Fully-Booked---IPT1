@@ -98,6 +98,9 @@ router.get("/", async (req, res) => {
         console.error("Error fetching admin stats:", error);
         res.status(500).json({ message: "Failed to fetch admin stats" });
     }
+
+
+    
 });
 
 module.exports = router;
