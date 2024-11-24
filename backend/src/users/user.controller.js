@@ -145,32 +145,36 @@ exports.adminCreateUser = async (req, res, next) => {
     }
 };
 
-  
-
 exports.updateUser = async (req, res) => {
     try {
         const { id } = req.params;
 
+        // Find the existing user
         const existingUser = await User.findById(id);
         if (!existingUser) {
             return res.status(404).send({ message: "User not found!" });
         }
 
-        const updatedData = { ...req.body }; 
+        // Prepare updated data
+        const updatedData = { ...req.body };
+
+        // Handle avatar upload
         if (req.file && req.file.path) {
-            updatedData.avatar = req.file.path; // Handle avatar upload if provided
+            updatedData.avatar = req.file.path; // Save Cloudinary URL
         }
 
+        // Update the user
         const updatedUser = await User.findByIdAndUpdate(id, updatedData, { new: true });
         res.status(200).send({
             message: "User updated successfully",
             user: updatedUser,
         });
     } catch (error) {
-        console.error("Error: Updating a User", error);
+        console.error("Error updating user:", error);
         res.status(500).send({ message: "Failed to update the user!" });
     }
 };
+
 
 exports.deleteUser = async (req, res) => {
     try {
