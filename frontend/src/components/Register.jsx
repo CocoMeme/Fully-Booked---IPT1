@@ -176,7 +176,7 @@ const Register = () => {
       >
         <SnackbarContent
           style={{
-            backgroundColor: alert.severity === "success" ? "#90EE90" : alert.severity === "error" ? "red" : "green",
+            backgroundColor: alert.severity === "success" ? "#90EE90" : alert.severity === "error" ? "red" : "#90EE90",
             color: "white",
             fontWeight: "bold",
             fontSize: "18px", 
