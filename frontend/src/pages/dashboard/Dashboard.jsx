@@ -32,7 +32,7 @@ const Dashboard = () => {
     const [alertOpen, setAlertOpen] = useState(false);
 
     const navigate = useNavigate();
-
+ 
     useEffect(() => {
         const fetchData = async () => {
             try {
@@ -53,7 +53,7 @@ const Dashboard = () => {
         };
 
         fetchData();
-    }, []); // Only run once when the component mounts
+    }, []); 
 
     const showAlert = (message) => {
         setAlertMessage(message);
@@ -122,101 +122,146 @@ const Dashboard = () => {
     };
 
     return (
-        <Container maxWidth="xl" style={{ padding: 0 }}>
-            <Snackbar
-                open={alertOpen}
-                autoHideDuration={3000}
-                onClose={handleAlertClose}
-                anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-            >
-                <Alert onClose={handleAlertClose} severity="warning" sx={{ width: '100%' }}>
-                    {alertMessage}
-                </Alert>
-            </Snackbar>
+        <>
+            <section className="grid md:grid-cols-2 xl:grid-cols-4 gap-6">
+                <div className="flex items-center p-8 bg-white shadow rounded-lg">
+                    <div className="inline-flex flex-shrink-0 items-center justify-center h-16 w-16 text-purple-600 bg-purple-100 rounded-full mr-6">
+                        <GoBook className='size-6' />
+                    </div>
+                    <div>
+                        <span className="block text-2xl font-bold">{data?.totalBooks ? data?.totalBooks : 0}</span>
+                        <span className="block text-gray-500">Current Book Number</span>
+                    </div>
+                </div>
+                <div className="flex items-center p-8 bg-white shadow rounded-lg">
+                    <div className="inline-flex flex-shrink-0 items-center justify-center h-16 w-16 text-green-600 bg-green-100 rounded-full mr-6">
+                        <IoMdTrendingUp className='size-6' />
+                    </div>
+                    <div>
+                        <span className="block text-2xl font-bold">
+                            ₱ {data?.totalSales ? data.totalSales.toFixed(2) : "0.00"}
+                        </span>
+                        <span className="block text-gray-500">Total Sales</span>
+                    </div>
+                </div>
+                <div className="flex items-center p-8 bg-white shadow rounded-lg">
+                    <div className="inline-flex flex-shrink-0 items-center justify-center h-16 w-16 text-red-600 bg-red-100 rounded-full mr-6">
+                        <RiFireLine className='size-6' />
+                    </div>
+                    <div>
+                        <span className="inline-block text-2xl font-bold">{data?.hotBooks}</span>
+                        <span className="inline-block text-xl text-gray-500 font-semibold"></span>
+                        <span className="block text-gray-500">Hot Books in This Month</span>
+                    </div>
+                </div>
+                <div className="flex items-center p-8 bg-white shadow rounded-lg">
+                    <div className="inline-flex flex-shrink-0 items-center justify-center h-16 w-16 text-blue-600 bg-blue-100 rounded-full mr-6">
+                        <RiShoppingCartLine className='size-6' />
+                    </div>
+                    <div>
+                        <span className="block text-2xl font-bold">{data?.totalOrders}</span>
+                        <span className="block text-gray-500">Total Orders</span>
+                    </div>
+                </div>
+                
+            </section>
+            <Container maxWidth="xl" style={{ padding: 0 }}>
+                <Snackbar
+                    open={alertOpen}
+                    autoHideDuration={3000}
+                    onClose={handleAlertClose}
+                    anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+                >
+                    <Alert onClose={handleAlertClose} severity="warning" sx={{ width: '100%' }}>
+                        {alertMessage}
+                    </Alert>
+                </Snackbar>
 
-            {/* Overview Cards */}
-            <Grid container spacing={2}>
-                {/* Cards */}
-            </Grid>
+                {/* Overview Cards */}
+                <Grid container spacing={2}>
+                    {/* Cards */}
+                </Grid>
 
-            {/* Charts Section */}
-            <Grid container spacing={2} style={{ marginTop: 16 }}>
-                <Grid item xs={12} md={6}>
-                    <Paper elevation={2} style={{ padding: 16 }}>
-                        <Typography variant="h6" style={{ marginBottom: 16 }}>
-                            Monthly Orders Chart
-                        </Typography>
-                        <Box display="flex" alignItems="center" marginBottom={2}>
-                            <TextField
-                                label="Start Date"
-                                type="date"
-                                value={ordersDateRange.start}
-                                onChange={(e) => setOrdersDateRange({ ...ordersDateRange, start: e.target.value })}
-                                InputLabelProps={{ shrink: true }}
-                                size="small"
-                                fullWidth
-                                style={{ marginRight: 8 }}
-                            />
-                            <TextField
-                                label="End Date"
-                                type="date"
-                                value={ordersDateRange.end}
-                                onChange={(e) => setOrdersDateRange({ ...ordersDateRange, end: e.target.value })}
-                                InputLabelProps={{ shrink: true }}
-                                size="small"
-                                fullWidth
-                            />
-                            <Button
-                                variant="contained"
-                                color="primary"
-                                onClick={handleFilterOrders}
-                                style={{ marginLeft: 8, height: 40 }}
-                            >
-                                Filter
-                            </Button>
-                        </Box>
-                        <OrdersChart monthlyOrders={filteredOrders} />
-                    </Paper>
+                {/* Charts Section */}
+                <Grid container spacing={2} style={{ marginTop: 16 }}>
+                    <Grid item xs={12} md={6}>
+                        <Paper elevation={2} style={{ padding: 16 }}>
+                            <Typography variant="h6" style={{ marginBottom: 16 }}>
+                                Monthly Orders Chart
+                            </Typography>
+                            <Box display="flex" alignItems="center" marginBottom={2}>
+                                <TextField
+                                    label="Start Date"
+                                    type="date"
+                                    value={ordersDateRange.start}
+                                    onChange={(e) => setOrdersDateRange({ ...ordersDateRange, start: e.target.value })}
+                                    InputLabelProps={{ shrink: true }}
+                                    size="small"
+                                    fullWidth
+                                    style={{ marginRight: 8 }}
+                                />
+                                <TextField
+                                    label="End Date"
+                                    type="date"
+                                    value={ordersDateRange.end}
+                                    onChange={(e) => setOrdersDateRange({ ...ordersDateRange, end: e.target.value })}
+                                    InputLabelProps={{ shrink: true }}
+                                    size="small"
+                                    fullWidth
+                                />
+                                <Button
+                                    variant="contained"
+                                    color="primary"
+                                    onClick={handleFilterOrders}
+                                    style={{ marginLeft: 8, height: 40 }}
+                                >
+                                    Filter
+                                </Button>
+                            </Box>
+                            <OrdersChart monthlyOrders={filteredOrders} />
+                        </Paper>
+                    </Grid>
+                    <Grid item xs={12} md={6}>
+                        <Paper elevation={2} style={{ padding: 16 }}>
+                            <Typography variant="h6" style={{ marginBottom: 16 }}>
+                                Monthly Sales Chart
+                            </Typography>
+                            <Box display="flex" alignItems="center" marginBottom={2}>
+                                <TextField
+                                    label="Start Date"
+                                    type="date"
+                                    value={salesDateRange.start}
+                                    onChange={(e) => setSalesDateRange({ ...salesDateRange, start: e.target.value })}
+                                    InputLabelProps={{ shrink: true }}
+                                    size="small"
+                                    fullWidth
+                                    style={{ marginRight: 8 }}
+                                />
+                                <TextField
+                                    label="End Date"
+                                    type="date"
+                                    value={salesDateRange.end}
+                                    onChange={(e) => setSalesDateRange({ ...salesDateRange, end: e.target.value })}
+                                    InputLabelProps={{ shrink: true }}
+                                    size="small"
+                                    fullWidth
+                                />
+                                <Button
+                                    variant="contained"
+                                    color="primary"
+                                    onClick={handleFilterSales}
+                                    style={{ marginLeft: 8, height: 40 }}
+                                >
+                                    Filter
+                                </Button>
+                            </Box>
+                            <SalesChart monthlySales={filteredSales} />
+                        </Paper>
+                    </Grid>
                 </Grid>
-                <Grid item xs={12} md={6}>
-                    <Paper elevation={2} style={{ padding: 16 }}>
-                        <Typography variant="h6" style={{ marginBottom: 16 }}>
-                            Monthly Sales Chart
-                        </Typography>
-                        <Box display="flex" alignItems="center" marginBottom={2}>
-                            <TextField
-                                label="Start Date"
-                                type="date"
-                                value={salesDateRange.start}
-                                onChange={(e) => setSalesDateRange({ ...salesDateRange, start: e.target.value })}
-                                InputLabelProps={{ shrink: true }}
-                                size="small"
-                                fullWidth
-                                style={{ marginRight: 8 }}
-                            />
-                            <TextField
-                                label="End Date"
-                                type="date"
-                                value={salesDateRange.end}
-                                onChange={(e) => setSalesDateRange({ ...salesDateRange, end: e.target.value })}
-                                InputLabelProps={{ shrink: true }}
-                                size="small"
-                                fullWidth
-                            />
-                            <Button
-                                variant="contained"
-                                color="primary"
-                                onClick={handleFilterSales}
-                                style={{ marginLeft: 8, height: 40 }}
-                            >
-                                Filter
-                            </Button>
-                        </Box>
-                        <SalesChart monthlySales={filteredSales} />
-                    </Paper>
-                </Grid>
-            </Grid>
-        </Container>
+            </Container>
+        </>
+
     );
 };
 
