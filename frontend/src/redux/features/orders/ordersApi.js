@@ -38,7 +38,7 @@ const ordersApi = createApi({
         }),
         updateOrderStatus: builder.mutation({
             query: ({ id, status }) => ({
-                url: `/${id}/status`,
+                url: `/${id}`,
                 method: "PUT",
                 body: { status },
             }),
