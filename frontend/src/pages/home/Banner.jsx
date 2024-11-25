@@ -5,6 +5,8 @@ import bannerImg2 from "../../assets/banner2.png";
 import bannerImg3 from "../../assets/banner3.png";
 import bannerImg4 from "../../assets/banner4.png";
 import bannerImg5 from "../../assets/banner5.png";
+import bannerImg6 from "../../assets/banner6.png";
+
 
 // Styled components for the carousel
 const CarouselContainer = styled("div")(() => ({
@@ -44,7 +46,7 @@ const CarouselImage = styled("img")(() => ({
 
 const Banner = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const images = [bannerImg1, bannerImg2, bannerImg3, bannerImg4, bannerImg5];
+  const images = [bannerImg1, bannerImg2, bannerImg3, bannerImg4, bannerImg5, bannerImg6];
 
   useEffect(() => {
     const interval = setInterval(() => {

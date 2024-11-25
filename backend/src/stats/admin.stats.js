@@ -47,7 +47,7 @@ router.get("/", async (req, res) => {
         const paddedMonthlySales = [];
         const currentYear = new Date().getFullYear();
 
-        for (let year = currentYear - 1; year <= currentYear; year++) {
+        for (let year = currentYear; year <= currentYear; year++) {
             for (let month = 1; month <= 12; month++) {
                 const data = monthlySales.find(sale => sale._id.year === year && sale._id.month === month);
                 paddedMonthlySales.push({

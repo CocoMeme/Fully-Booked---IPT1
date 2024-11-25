@@ -80,7 +80,7 @@ const Navbar = () => {
         {/* Center */}
         <div className="w-2/5 text-white">
           <ul className="flex md:gap-4 text-md text-center font-semibold">
-            <Link to="/">
+            <Link to="/store">
               <li className="nav-item">Store</li>
             </Link>
             <Link to="/apply-courier">
