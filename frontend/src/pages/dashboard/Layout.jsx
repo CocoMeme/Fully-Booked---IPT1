@@ -68,10 +68,10 @@ const Layout = () => {
             </Link>
 
             <Link
-              to="/dashboard"
+              to="/dashboard/manage-orders"
               className="inline-flex items-center justify-center py-3 hover:text-gray-400 hover:bg-gray-700 focus:text-gray-400 focus:bg-gray-700 rounded-lg"
             >
-              <span className="sr-only">Transaction</span>
+              <span className="sr-only">Orders</span>
               <FaMoneyBillWave className="size-6" />
             </Link>
           </nav>

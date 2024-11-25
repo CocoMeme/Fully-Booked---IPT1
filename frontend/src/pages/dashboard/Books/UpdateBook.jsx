@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useForm, Controller } from "react-hook-form";
-import { useParams, Link, Outlet } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import Swal from "sweetalert2";
@@ -47,13 +47,13 @@ const validationSchema = yup.object().shape({
 
 const UpdateBook = () => {
   const { id } = useParams();
-  const { data: bookData, isLoading, isError, refetch } =
-    useFetchBookByIdQuery(id);
-  const [selectedFiles, setSelectedFiles] = useState([]);
+  const { data: bookData, isLoading, isError, refetch } = useFetchBookByIdQuery(id);
+  const [imageFiles, setImageFiles] = useState([]);
+  const [imagePreviews, setImagePreviews] = useState([]);
   const [uploadedImageUrls, setUploadedImageUrls] = useState([]);
-  const [uploading, setUploading] = useState(false);
+  const [updateBook, { isLoading: updating }] = useUpdateBookMutation();
 
-  const { control, handleSubmit, setValue, reset, watch } = useForm({
+  const { control, handleSubmit, reset, watch } = useForm({
     resolver: yupResolver(validationSchema),
     defaultValues: {
       title: "",
@@ -68,6 +68,7 @@ const UpdateBook = () => {
 
   const tag = watch("tag");
 
+  // Populate form with existing book data
   useEffect(() => {
     if (bookData) {
       reset({
@@ -83,73 +84,84 @@ const UpdateBook = () => {
     }
   }, [bookData, reset]);
 
-  const uploadImages = async (files) => {
-    const formData = new FormData();
-    files.forEach((file) => formData.append("coverImage", file)); // Match multer's field name
+  const handleFileChange = (e) => {
+    const files = Array.from(e.target.files);
+    setImageFiles(files);
 
-    try {
-      const response = await axios.post(
-        `${getBaseUrl()}/api/books/upload-cover`, 
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }
-      );
-      return response.data; // Assume server responds with array of uploaded URLs
-    } catch (error) {
-      console.error("Error uploading images:", error);
-      return [];
-    }
+    const previews = files.map((file) => URL.createObjectURL(file));
+    setImagePreviews(previews);
   };
 
-
-  const onSubmit = async (data) => {
+  const uploadImages = async (files) => {
+    if (!files.length) return []; // Early return if no files selected
+  
+    const formData = new FormData();
+    files.forEach((file) => formData.append("coverImages", file)); // Ensure 'coverImages' matches multer's field name
+  
     try {
-      setUploading(true);
-
-      // Upload any newly selected files
-      const newImageUrls = selectedFiles.length
-        ? await uploadImages(selectedFiles)
-        : [];
-
-      // Combine existing and new image URLs
-      const updatedCoverImages = [...uploadedImageUrls, ...newImageUrls];
-
-      // Prepare data for submission
-      const updatedData = {
-        ...data,
-        coverImage: updatedCoverImages,
-      };
-
-      // Send updated data to the server
-      await axios.put(`${getBaseUrl()}/api/books/edit/${id}`, updatedData, {
+      const response = await axios.post(`${getBaseUrl()}/api/books/upload-cover`, formData, {
         headers: {
+          "Content-Type": "multipart/form-data",
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
       });
-
+      return response.data.coverImages || []; // Return uploaded image URLs
+    } catch (error) {
+      console.error("Error uploading images:", error);
+      Swal.fire({
+        title: "Error",
+        text: "Failed to upload images. Please try again.",
+        icon: "error",
+      });
+      return [];
+    }
+  };
+  
+  const onSubmit = async (data) => {
+    try {
+      let newImageUrls = [];
+  
+      // If new files are selected, upload them
+      if (imageFiles.length > 0) {
+        newImageUrls = await uploadImages(imageFiles);
+      }
+  
+      // Replace old URLs with the new ones
+      const updatedData = {
+        ...data,
+        coverImage: newImageUrls, // Replace old URLs with new ones
+      };
+  
+      console.log("Updated Data:", updatedData); // Debug updated data
+  
+      // Ensure id is correctly passed
+      console.log("Book ID:", id);
+  
+      // Send updated data to the server
+      await updateBook({ id, ...updatedData }).unwrap();
+  
       Swal.fire({
         title: "Book Updated",
         text: "Your book has been updated successfully!",
         icon: "success",
       });
-
-      refetch();
-      setUploading(false);
+  
+      refetch(); // Refetch book data
+      reset();
+      setImageFiles([]);
+      setImagePreviews([]);
     } catch (error) {
       console.error("Error updating book:", error);
       Swal.fire({
         title: "Error",
-        text: "Failed to update the book.",
+        text: error?.data?.message || "Failed to update the book. Please try again.",
         icon: "error",
       });
-      setUploading(false);
     }
   };
-
+  
+  
+  
 
   if (isLoading) {
     return (
@@ -171,29 +183,8 @@ const UpdateBook = () => {
 
   return (
     <section>
-
       <main className="mb-7 w-full xl:w-10/12 xl:mb-7 px-4 mx-auto">
-        <div className="flex flex-col space-y-6 md:space-y-0 md:flex-row justify-between">
-          <div className="mr-6">
-            <h1 className="text-4xl font-bold mb-1">Book Management</h1>
-            <h2 className="text-gray-600 ml-0.5">Admin Functionality</h2>
-          </div>
-          <div className="flex flex-col md:flex-row items-start justify-end -mb-3">
-            <Link
-              to="/dashboard/manage-books"
-              className="inline-flex px-5 py-3 text-gray-600 hover:text-gray-700 focus:text-gray-700 hover:bg-gray-100 focus:bg-gray-100 border border-gray-600 rounded-md mb-3"
-            >
-              Manage Books
-            </Link>
-            <Link
-              to="/dashboard/add-new-book"
-              className="inline-flex px-5 py-3 text-white bg-gray-600 hover:bg-gray-700 focus:bg-gray-700 rounded-md ml-6 mb-3"
-            >
-              Add New Book
-            </Link>
-          </div>
-        </div>
-        <Outlet />
+        <h1 className="text-4xl font-bold mb-1">Update Book</h1>
       </main>
 
       <Box
@@ -206,10 +197,6 @@ const UpdateBook = () => {
         borderRadius={2}
         bgcolor="white"
       >
-        <Typography variant="h4" fontWeight="bold" textAlign="center" mb={3}>
-          Update Book
-        </Typography>
-
         {/* Title */}
         <Controller
           name="title"
@@ -225,7 +212,6 @@ const UpdateBook = () => {
             />
           )}
         />
-
         {/* Description */}
         <Controller
           name="description"
@@ -326,40 +312,35 @@ const UpdateBook = () => {
           type="file"
           accept="image/*"
           multiple
-          onChange={(e) => setSelectedFiles([...e.target.files])}
-          name="coverImage" // Match multer's field name
+          onChange={handleFileChange}
           className="mb-3"
         />
 
-
-        {/* Preview */}
+        {/* Preview Images */}
         <Box display="flex" flexWrap="wrap" gap={2} mb={2}>
+          {/* Existing Images */}
           {uploadedImageUrls.map((url, index) => (
             <img
               key={index}
               src={url}
-              alt={`Uploaded ${index + 1}`}
+              alt={`Existing ${index + 1}`}
               style={{ width: 100, height: 100, objectFit: "cover", borderRadius: 4 }}
             />
           ))}
-          {selectedFiles.map((file, index) => (
+
+          {/* New Previews */}
+          {imagePreviews.map((src, index) => (
             <img
               key={index}
-              src={URL.createObjectURL(file)}
+              src={src}
               alt={`Preview ${index + 1}`}
               style={{ width: 100, height: 100, objectFit: "cover", borderRadius: 4 }}
             />
           ))}
         </Box>
 
-        <Button
-          variant="contained"
-          color="primary"
-          fullWidth
-          type="submit"
-          disabled={uploading}
-        >
-          {uploading ? "Uploading..." : "Update Book"}
+        <Button variant="contained" color="primary" fullWidth type="submit" disabled={updating}>
+          {updating ? "Updating..." : "Update Book"}
         </Button>
       </Box>
     </section>

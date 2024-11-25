@@ -1,5 +1,7 @@
 const Book = require('./book.model');
 const uploadToCloudinary = require('../../utils/cloudinaryUploader');
+const mongoose = require("mongoose"); // Ensure mongoose is imported for ObjectId validation
+
 
 const postBook = async (req, res) => {
   try {
@@ -31,7 +33,15 @@ const postBook = async (req, res) => {
 
 const updateBook = async (req, res) => {
   try {
+    console.log("Files received:", req.files); // Debug uploaded files
+    console.log("Body received:", req.body); // Debug body data
+
     const { id } = req.params;
+
+    // Validate ObjectId
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).send({ message: "Invalid book ID!" });
+    }
 
     // Fetch the existing book
     const existingBook = await Book.findById(id);
@@ -41,26 +51,47 @@ const updateBook = async (req, res) => {
 
     const { body, files } = req;
 
-    // Upload new images if provided
-    let updatedImages = existingBook.coverImage;
+    // Replace cover images with new ones only if files are provided
+    let updatedImages = [];
+
     if (files && files.length > 0) {
+      // Upload new images and get their URLs
       const uploadedImages = await Promise.all(
         files.map(async (file) => {
-          const result = await uploadToCloudinary(file, 'Fully Booked');
-          if (!result.success) throw new Error(result.error);
-          return result.url;
+          try {
+            const result = await uploadToCloudinary(file, "Fully Booked");
+            return result;
+          } catch (error) {
+            console.error("Cloudinary Upload Error:", error);
+            return { success: false, error: error.message };
+          }
         })
       );
 
-      updatedImages = uploadedImages; // Replace all old images
+      // Check for failed uploads
+      const failedUploads = uploadedImages.filter((img) => !img.success);
+      if (failedUploads.length > 0) {
+        throw new Error("Some images failed to upload.");
+      }
+
+      updatedImages = uploadedImages.map((img) => img.url); // Replace old URLs with new ones
+    } else {
+      // If no files are uploaded, keep the existing image URLs from the database
+      updatedImages = existingBook.coverImage;
     }
 
-    // Update the book fields
+    // Update book data
     const updatedData = {
       ...body,
-      coverImage: updatedImages,
+      coverImage: updatedImages, // Ensure only the new images are used
     };
 
+    // Validate price and discount price
+    if (updatedData.tag === "Sale" && (!updatedData.discountPrice || updatedData.discountPrice <= 0)) {
+      return res.status(400).send({ message: "Discount price is required and must be positive for 'Sale' tag!" });
+    }
+
+    // Update the book in the database
     const updatedBook = await Book.findByIdAndUpdate(id, updatedData, { new: true });
 
     res.status(200).send({
@@ -72,6 +103,7 @@ const updateBook = async (req, res) => {
     res.status(500).send({ message: "Failed to update the book!", error: error.message });
   }
 };
+
 
 const getAllBooks = async (req, res) => {
   try {

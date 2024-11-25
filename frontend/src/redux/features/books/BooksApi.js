@@ -34,16 +34,17 @@ const booksApi = createApi ({
             invalidatesTags: ["Books"]
         }),
         updateBook: builder.mutation({
-            query: (id, ...rest) => ({
-                url: `/edit/${id}`,
-                method: "PUT",
-                body: rest,
-                headers: {
-                    'Content-Type': 'application/json'
-                }
+            query: ({ id, ...rest }) => ({
+              url: `/edit/${id}`, // Make sure id is part of the URL
+              method: "PUT",
+              body: rest, // Rest of the book data goes into the body
+              headers: {
+                'Content-Type': 'application/json'
+              }
             }),
-            invalidatesTags: ["Books"]        
-        }),
+            invalidatesTags: ["Books"]
+          }),
+          
         deleteBook: builder.mutation({
             query: (id) => ({
                 url: `/${id}`,

@@ -18,6 +18,8 @@ import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { useAuth } from '../../context/AuthContext';
 import axios from 'axios';
 import getBaseUrl from '../../utils/baseURL';
+import { Filter } from 'bad-words';
+
 
 const ReviewBook = ({ book }) => {
   const [rating, setRating] = useState(0);
@@ -32,6 +34,7 @@ const ReviewBook = ({ book }) => {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
   const { currentUser } = useAuth();
+  const filter = new Filter(); // Initialize bad-words filter
 
   useEffect(() => {
     if (book?._id) {
@@ -73,11 +76,12 @@ const ReviewBook = ({ book }) => {
     }
 
     const email = currentUser?.email || 'Anonymous';
+    const sanitizedComment = filter.clean(comment); // Clean the comment
 
     try {
       await axios.post(`${getBaseUrl()}/api/reviews/${book._id}`, {
         rating,
-        comment,
+        comment: sanitizedComment,
         email,
       });
 
@@ -113,10 +117,12 @@ const ReviewBook = ({ book }) => {
   const handleUpdateReview = async () => {
     if (!selectedReview?._id) return;
 
+    const sanitizedComment = filter.clean(selectedReview.comment); // Clean the updated comment
+
     try {
       await axios.put(`${getBaseUrl()}/api/reviews/${selectedReview._id}`, {
         rating: selectedReview.rating,
-        comment: selectedReview.comment,
+        comment: sanitizedComment,
       });
       fetchReviews(book._id); // Refresh reviews after update
       setIsUpdateDialogOpen(false);

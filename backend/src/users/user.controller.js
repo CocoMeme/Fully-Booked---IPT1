@@ -175,7 +175,6 @@ exports.updateUser = async (req, res) => {
     }
 };
 
-
 exports.deleteUser = async (req, res) => {
     try {
         const { id } = req.params;
@@ -276,3 +275,6 @@ exports.processCourierApplication = async (req, res) => {
         res.status(500).json({ message: 'An error occurred while processing the application' });
     }
 };
+
+
+  

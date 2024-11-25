@@ -22,6 +22,7 @@ import Store from "../pages/store/Store";
 import AddUser from "../pages/dashboard/Users/AddUser";
 import UpdateUser from "../pages/dashboard/Users/UpdateUser";
 import ManageUsers from "../pages/dashboard/Users/ManageUsers";
+import ManageOrders from "../pages/dashboard/Orders/ManageOrders";
 
 const router = createBrowserRouter([
     {
@@ -123,7 +124,13 @@ const router = createBrowserRouter([
           element: <AdminRoute>
               <ManageUsers />
           </AdminRoute>
-        }        
+        },
+        {
+          path: "manage-orders",
+          element: <AdminRoute>
+              <ManageOrders />
+          </AdminRoute>
+        } 
       ]
     },
     {
